@@ -60,6 +60,23 @@ export default function AdminPage() {
     }
   }
 
+  async function removeAllExcluded() {
+    const targets = filtered.filter((p) => p.hidden);
+    if (!targets.length) return;
+    if (!confirm(`Permanently remove all ${targets.length} excluded players shown?`)) return;
+    await Promise.all(
+      targets.map((photo) =>
+        fetch("/api/admin/photos", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: photo.id }),
+        })
+      )
+    );
+    const removedIds = new Set(targets.map((p) => p.id));
+    setPhotos((prev) => prev.filter((p) => !removedIds.has(p.id)));
+  }
+
   const filtered = useMemo(() => {
     return photos.filter((p) => {
       const name = (p.labels?.en ?? "").toLowerCase();
@@ -134,7 +151,17 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="text-xs text-zinc-500">{filtered.length} players shown</div>
+      <div className="flex items-center justify-between">
+        <div className="text-xs text-zinc-500">{filtered.length} players shown</div>
+        {filtered.some((p) => p.hidden) && (
+          <button
+            onClick={removeAllExcluded}
+            className="text-xs font-semibold px-3 py-1 rounded-lg bg-zinc-800 hover:bg-red-900 text-zinc-400 hover:text-red-300 transition-colors"
+          >
+            Remove all excluded ({filtered.filter((p) => p.hidden).length})
+          </button>
+        )}
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {filtered.map((photo) => (
