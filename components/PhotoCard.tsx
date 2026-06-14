@@ -33,7 +33,7 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
         src={photo.url}
         alt={photo.label ?? "Photo"}
         fill
-        className="object-cover"
+        className="object-cover object-top"
         sizes="(max-width: 768px) 100vw, 50vw"
       />
       <div

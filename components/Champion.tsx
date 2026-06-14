@@ -19,7 +19,7 @@ export default function Champion({ photo, onRestart }: { photo: Photo; onRestart
       </div>
 
       <div className="relative w-72 h-72 rounded-3xl overflow-hidden ring-4 ring-yellow-400 shadow-2xl shadow-yellow-900/40">
-        <Image src={photo.url} alt={photo.label ?? "Champion"} fill className="object-cover" sizes="288px" priority />
+        <Image src={photo.url} alt={photo.label ?? "Champion"} fill className="object-cover object-top" sizes="288px" priority />
         <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-xs font-black px-4 py-1 rounded-full tracking-widest uppercase shadow">
           🏆 {t("champion.heading")}
         </div>

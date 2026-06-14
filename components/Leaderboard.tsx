@@ -27,7 +27,7 @@ export default function Leaderboard({ photos }: { photos: Photo[] }) {
                 {i + 1}
               </span>
               <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src={photo.url} alt={photo.label ?? "Photo"} fill className="object-cover" sizes="56px" />
+                <Image src={photo.url} alt={photo.label ?? "Photo"} fill className="object-cover object-top" sizes="56px" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-semibold truncate">{photo.label ?? `Photo ${i + 1}`}</p>
