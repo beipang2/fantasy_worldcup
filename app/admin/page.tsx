@@ -1,83 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
-import { useLocale } from "@/components/LocaleProvider";
-import { LOCALES, LOCALE_LABELS, type Locale } from "@/lib/i18n";
 
 interface Photo {
   id: string;
   url: string;
-  labels?: Record<string, string> | null;
+  labels: Record<string, string> | null;
+  hidden: boolean;
   rating: number;
   wins: number;
   losses: number;
 }
 
 export default function AdminPage() {
-  const { t } = useLocale();
   const [secret, setSecret] = useState("");
   const [authed, setAuthed] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [file, setFile] = useState<File | null>(null);
-  const [labels, setLabels] = useState<Record<Locale, string>>({ en: "", fr: "", es: "", zh: "", ja: "" });
-  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "active" | "excluded">("all");
   const [message, setMessage] = useState("");
 
   async function login() {
     document.cookie = `admin_secret=${secret}; path=/`;
-    const res = await fetch("/api/photos");
+    setLoading(true);
+    const res = await fetch("/api/admin/photos");
     if (res.ok) {
       setAuthed(true);
       setPhotos(await res.json());
     } else {
       setMessage("Wrong secret.");
     }
+    setLoading(false);
   }
 
-  async function upload() {
-    if (!file) return;
-    const missing = LOCALES.filter((l) => !labels[l].trim());
-    if (missing.length) {
-      setMessage(`Missing label for: ${missing.map((l) => LOCALE_LABELS[l]).join(", ")}`);
-      return;
-    }
-    setUploading(true);
-    const form = new FormData();
-    form.append("file", file);
-    form.append("labels", JSON.stringify(labels));
-    const res = await fetch("/admin/upload", { method: "POST", body: form });
+  async function toggleHidden(photo: Photo) {
+    const res = await fetch("/api/admin/photos", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: photo.id, hidden: !photo.hidden }),
+    });
     if (res.ok) {
-      const photo = await res.json();
-      setPhotos((p) => [photo, ...p]);
-      setFile(null);
-      setLabels({ en: "", fr: "", es: "", zh: "", ja: "" });
-      setMessage(t("admin.uploaded"));
-    } else {
-      setMessage(t("admin.uploadFailed"));
+      setPhotos((prev) =>
+        prev.map((p) => (p.id === photo.id ? { ...p, hidden: !p.hidden } : p))
+      );
     }
-    setUploading(false);
   }
 
-  async function hidePhoto(id: string) {
-    await fetch("/admin/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
-    setPhotos((p) => p.filter((ph) => ph.id !== id));
-  }
+  const filtered = useMemo(() => {
+    return photos.filter((p) => {
+      const name = (p.labels?.en ?? "").toLowerCase();
+      const matchSearch = name.includes(search.toLowerCase());
+      const matchFilter =
+        filter === "all" ||
+        (filter === "active" && !p.hidden) ||
+        (filter === "excluded" && p.hidden);
+      return matchSearch && matchFilter;
+    });
+  }, [photos, search, filter]);
+
+  const activeCount = photos.filter((p) => !p.hidden).length;
+  const excludedCount = photos.filter((p) => p.hidden).length;
 
   if (!authed) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 max-w-sm w-full mx-auto">
-        <h1 className="text-2xl font-black">{t("admin.loginTitle")}</h1>
+        <h1 className="text-2xl font-black">Admin Login</h1>
         <input
           type="password"
-          placeholder={t("admin.secretPlaceholder")}
+          placeholder="Admin secret"
           value={secret}
           onChange={(e) => setSecret(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && login()}
           className="w-full px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white outline-none focus:ring-2 focus:ring-rose-500"
         />
-        <button onClick={login} className="w-full py-2 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-semibold transition-colors">
-          {t("admin.loginButton")}
+        <button
+          onClick={login}
+          disabled={loading}
+          className="w-full py-2 rounded-lg bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-semibold transition-colors"
+        >
+          {loading ? "Logging in…" : "Login"}
         </button>
         {message && <p className="text-rose-400 text-sm">{message}</p>}
       </div>
@@ -85,43 +88,76 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-3xl mx-auto px-4">
-      <h1 className="text-3xl font-black">{t("admin.title")}</h1>
-
-      <div className="bg-zinc-900 rounded-xl p-6 flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">{t("admin.uploadTitle")}</h2>
-        <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm text-zinc-400" />
-        <div className="grid grid-cols-1 gap-2">
-          {LOCALES.map((locale) => (
-            <input
-              key={locale}
-              type="text"
-              placeholder={`${LOCALE_LABELS[locale]} label`}
-              value={labels[locale]}
-              onChange={(e) => setLabels((prev) => ({ ...prev, [locale]: e.target.value }))}
-              className="px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white outline-none focus:ring-2 focus:ring-rose-500 text-sm"
-            />
-          ))}
+    <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto px-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-black">Player Management</h1>
+        <div className="text-sm text-zinc-400">
+          <span className="text-white font-semibold">{activeCount}</span> active &middot;{" "}
+          <span className="text-zinc-500">{excludedCount}</span> excluded
         </div>
-        <button onClick={upload} disabled={!file || uploading} className="self-start px-6 py-2 rounded-lg bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-semibold transition-colors">
-          {uploading ? t("admin.uploadingButton") : t("admin.uploadButton")}
-        </button>
-        {message && <p className="text-emerald-400 text-sm">{message}</p>}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {photos.map((photo) => (
-          <div key={photo.id} className="relative group rounded-xl overflow-hidden bg-zinc-900">
+      <div className="flex gap-3 flex-wrap">
+        <input
+          type="text"
+          placeholder="Search by name…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 min-w-48 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white outline-none focus:ring-2 focus:ring-rose-500 text-sm"
+        />
+        <div className="flex rounded-lg overflow-hidden border border-zinc-700 text-sm">
+          {(["all", "active", "excluded"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 capitalize transition-colors ${
+                filter === f
+                  ? "bg-rose-500 text-white"
+                  : "bg-zinc-900 text-zinc-400 hover:text-white"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="text-xs text-zinc-500">{filtered.length} players shown</div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        {filtered.map((photo) => (
+          <div
+            key={photo.id}
+            className={`relative rounded-xl overflow-hidden bg-zinc-900 transition-opacity ${
+              photo.hidden ? "opacity-40" : ""
+            }`}
+          >
             <div className="relative aspect-square">
-              <Image src={photo.url} alt={photo.labels?.en ?? "Photo"} fill className="object-cover" sizes="(max-width: 768px) 50vw, 33vw" />
+              <Image
+                src={photo.url}
+                alt={photo.labels?.en ?? "Player"}
+                fill
+                className="object-cover object-top"
+                sizes="(max-width: 640px) 50vw, 20vw"
+              />
             </div>
-            <div className="p-2 text-xs text-zinc-400">
-              <p className="truncate font-medium text-white">{photo.labels?.en ?? "—"}</p>
-              <p>ELO: {Math.round(photo.rating)}</p>
-              <p>{photo.wins}W / {photo.losses}L</p>
+            <div className="p-2">
+              <p className="text-white text-xs font-semibold truncate">
+                {photo.labels?.en ?? "—"}
+              </p>
+              <p className="text-zinc-500 text-xs">
+                {photo.wins}W / {photo.losses}L
+              </p>
             </div>
-            <button onClick={() => hidePhoto(photo.id)} className="absolute top-2 right-2 bg-black/70 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-all">
-              {t("admin.removeButton")}
+            <button
+              onClick={() => toggleHidden(photo)}
+              className={`w-full text-xs font-semibold py-1 transition-colors ${
+                photo.hidden
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                  : "bg-zinc-700 hover:bg-rose-600 text-zinc-200 hover:text-white"
+              }`}
+            >
+              {photo.hidden ? "Include" : "Exclude"}
             </button>
           </div>
         ))}
