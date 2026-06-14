@@ -7,6 +7,9 @@
  *   node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json deployment/import_players.ts --team usa
  */
 
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import * as fs from "fs";
