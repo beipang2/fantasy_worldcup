@@ -23,7 +23,7 @@ export default function Nav() {
         <select
           value={locale}
           onChange={(e) => switchLocale(e.target.value)}
-          className="bg-zinc-900 border border-zinc-700 text-zinc-400 text-sm rounded-lg px-2 py-1 outline-none hover:border-zinc-500 focus:border-rose-500 transition-colors cursor-pointer"
+          className="bg-transparent border-none text-zinc-400 text-sm outline-none hover:text-white transition-colors cursor-pointer"
         >
           {LOCALES.map((l) => (
             <option key={l} value={l}>{LOCALE_LABELS[l]}</option>

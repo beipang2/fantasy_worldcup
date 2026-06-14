@@ -2,7 +2,8 @@
   "site": {
     "title": "¡Socorro! Estoy rodeada de futbolistas guapos",
     "name": "¡Socorro! Estoy rodeada de futbolistas guapos",
-    "description": "Vota por tu futbolista favorito"
+    "description": "Vota por tu futbolista favorito",
+    "tagline": "Por amor al fútbol — solo por diversión"
   },
   "nav": { "vote": "Votar", "leaderboard": "Clasificación" },
   "vote": {

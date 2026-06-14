@@ -22,7 +22,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       <h1 className="text-4xl font-black tracking-tight text-center">
-        &lt;Tagline&gt;
+        {messages.site.tagline}
       </h1>
       <TournamentView photos={photos} locale={locale} />
     </div>

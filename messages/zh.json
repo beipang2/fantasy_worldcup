@@ -2,7 +2,8 @@
   "site": {
     "title": "救命 我被足坛帅哥包围了",
     "name": "救命 我被足坛帅哥包围了",
-    "description": "投票选出你心目中最帅的足坛男神"
+    "description": "投票选出你心目中最帅的足坛男神",
+    "tagline": "热爱足球 仅供娱乐"
   },
   "nav": { "vote": "投票", "leaderboard": "排行榜" },
   "vote": {

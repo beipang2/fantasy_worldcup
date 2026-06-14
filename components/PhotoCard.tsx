@@ -34,7 +34,7 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
         alt={photo.label ?? "Photo"}
         fill
         className="object-cover object-top"
-        sizes="(max-width: 768px) 100vw, 50vw"
+        sizes="(max-width: 768px) 50vw, 50vw"
       />
       <div
         className={`

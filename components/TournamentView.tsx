@@ -66,10 +66,10 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
       <p className="text-zinc-400 text-sm tracking-widest uppercase">
         {t("vote.prompt")}
       </p>
-      <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full max-w-4xl px-4">
+      <div className="flex flex-row items-center gap-2 md:gap-8 w-full max-w-4xl px-2 md:px-4">
         <PhotoCard photo={match.a} onClick={handleVote} disabled={!!voted} winner={voted === match.a.id} loser={voted !== null && voted !== match.a.id} />
         <div className="flex-shrink-0">
-          <span className="text-4xl font-black text-zinc-600 tracking-tighter">VS</span>
+          <span className="text-xl md:text-4xl font-black text-zinc-600 tracking-tighter">VS</span>
         </div>
         <PhotoCard photo={match.b} onClick={handleVote} disabled={!!voted} winner={voted === match.b.id} loser={voted !== null && voted !== match.b.id} />
       </div>

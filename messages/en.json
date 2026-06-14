@@ -2,7 +2,8 @@
   "site": {
     "title": "Help! I'm Surrounded by Football Hotties",
     "name": "Help! I'm Surrounded by Football Hotties!",
-    "description": "Vote for your favourite football heartthrob"
+    "description": "Vote for your favourite football heartthrob",
+    "tagline": "For the love of football — for fun only"
   },
   "nav": { "vote": "Vote", "leaderboard": "Leaderboard" },
   "vote": {

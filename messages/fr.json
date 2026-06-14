@@ -2,7 +2,8 @@
   "site": {
     "title": "Au secours ! Je suis entouré de beaux footballeurs",
     "name": "Au secours ! Je suis entouré de beaux footballeurs",
-    "description": "Votez pour votre footballeur préféré"
+    "description": "Votez pour votre footballeur préféré",
+    "tagline": "Par amour du football — juste pour le fun"
   },
   "nav": { "vote": "Voter", "leaderboard": "Classement" },
   "vote": {
