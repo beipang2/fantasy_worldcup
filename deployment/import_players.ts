@@ -3,8 +3,8 @@
  * Reads from fifa_data/data/players.json — run extract_players.py first.
  *
  * Usage:
- *   npx ts-node --project tsconfig.seed.json prisma/import_players.ts
- *   npx ts-node --project tsconfig.seed.json prisma/import_players.ts --team usa
+ *   node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json deployment/import_players.ts
+ *   node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json deployment/import_players.ts --team usa
  */
 
 import { PrismaClient } from "@prisma/client";
