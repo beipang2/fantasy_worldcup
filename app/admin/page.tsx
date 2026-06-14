@@ -21,6 +21,8 @@ export default function AdminPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "excluded">("all");
   const [message, setMessage] = useState("");
+  const [brokenIds, setBrokenIds] = useState<Set<string>>(new Set());
+  const [checkingBroken, setCheckingBroken] = useState(false);
 
   async function login() {
     document.cookie = `admin_secret=${secret}; path=/`;
@@ -57,6 +59,7 @@ export default function AdminPage() {
     });
     if (res.ok) {
       setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+      setBrokenIds((prev) => { const next = new Set(prev); next.delete(photo.id); return next; });
     }
   }
 
@@ -75,6 +78,36 @@ export default function AdminPage() {
     );
     const removedIds = new Set(targets.map((p) => p.id));
     setPhotos((prev) => prev.filter((p) => !removedIds.has(p.id)));
+    setBrokenIds((prev) => { const next = new Set(prev); removedIds.forEach((id) => next.delete(id)); return next; });
+  }
+
+  async function findBroken() {
+    setCheckingBroken(true);
+    setBrokenIds(new Set());
+    const res = await fetch("/api/admin/photos/broken");
+    if (res.ok) {
+      const { broken } = await res.json();
+      setBrokenIds(new Set(broken));
+    }
+    setCheckingBroken(false);
+  }
+
+  async function removeAllBroken() {
+    const targets = photos.filter((p) => !p.hidden && brokenIds.has(p.id));
+    if (!targets.length) return;
+    if (!confirm(`Permanently remove ${targets.length} active photos with broken URLs?`)) return;
+    await Promise.all(
+      targets.map((photo) =>
+        fetch("/api/admin/photos", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: photo.id }),
+        })
+      )
+    );
+    const removedIds = new Set(targets.map((p) => p.id));
+    setPhotos((prev) => prev.filter((p) => !removedIds.has(p.id)));
+    setBrokenIds(new Set());
   }
 
   const filtered = useMemo(() => {
@@ -91,6 +124,7 @@ export default function AdminPage() {
 
   const activeCount = photos.filter((p) => !p.hidden).length;
   const excludedCount = photos.filter((p) => p.hidden).length;
+  const brokenActiveCount = photos.filter((p) => !p.hidden && brokenIds.has(p.id)).length;
 
   if (!authed) {
     return (
@@ -124,6 +158,33 @@ export default function AdminPage() {
           <span className="text-white font-semibold">{activeCount}</span> active &middot;{" "}
           <span className="text-zinc-500">{excludedCount}</span> excluded
         </div>
+      </div>
+
+      {/* Broken photo tool */}
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+        <button
+          onClick={findBroken}
+          disabled={checkingBroken}
+          className="text-sm font-semibold px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white transition-colors whitespace-nowrap"
+        >
+          {checkingBroken ? "Scanning…" : "Find broken photos"}
+        </button>
+        {brokenActiveCount > 0 && (
+          <>
+            <span className="text-sm text-amber-400">
+              {brokenActiveCount} active photo{brokenActiveCount !== 1 ? "s" : ""} with broken URLs
+            </span>
+            <button
+              onClick={removeAllBroken}
+              className="ml-auto text-sm font-semibold px-4 py-1.5 rounded-lg bg-zinc-800 hover:bg-red-900 text-zinc-400 hover:text-red-300 transition-colors whitespace-nowrap"
+            >
+              Remove all broken
+            </button>
+          </>
+        )}
+        {!checkingBroken && brokenIds.size > 0 && brokenActiveCount === 0 && (
+          <span className="text-sm text-emerald-400">All active photos look good</span>
+        )}
       </div>
 
       <div className="flex gap-3 flex-wrap">
@@ -164,50 +225,58 @@ export default function AdminPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {filtered.map((photo) => (
-          <div
-            key={photo.id}
-            className={`relative rounded-xl overflow-hidden bg-zinc-900 transition-opacity ${
-              photo.hidden ? "opacity-40" : ""
-            }`}
-          >
-            <div className="relative aspect-square">
-              <Image
-                src={photo.url}
-                alt={photo.labels?.en ?? "Player"}
-                fill
-                className="object-cover object-top"
-                sizes="(max-width: 640px) 50vw, 20vw"
-              />
-            </div>
-            <div className="p-2">
-              <p className="text-white text-xs font-semibold truncate">
-                {photo.labels?.en ?? "—"}
-              </p>
-              <p className="text-zinc-500 text-xs">
-                {photo.wins}W / {photo.losses}L
-              </p>
-            </div>
-            <button
-              onClick={() => toggleHidden(photo)}
-              className={`w-full text-xs font-semibold py-1 transition-colors ${
-                photo.hidden
-                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
-                  : "bg-zinc-700 hover:bg-rose-600 text-zinc-200 hover:text-white"
-              }`}
+        {filtered.map((photo) => {
+          const isBroken = !photo.hidden && brokenIds.has(photo.id);
+          return (
+            <div
+              key={photo.id}
+              className={`relative rounded-xl overflow-hidden bg-zinc-900 transition-opacity ${
+                photo.hidden ? "opacity-40" : ""
+              } ${isBroken ? "ring-2 ring-amber-500" : ""}`}
             >
-              {photo.hidden ? "Include" : "Exclude"}
-            </button>
-            {photo.hidden && (
+              <div className="relative aspect-square">
+                <Image
+                  src={photo.url}
+                  alt={photo.labels?.en ?? "Player"}
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 640px) 50vw, 20vw"
+                />
+                {isBroken && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                    <span className="text-amber-400 text-xs font-bold">Broken</span>
+                  </div>
+                )}
+              </div>
+              <div className="p-2">
+                <p className="text-white text-xs font-semibold truncate">
+                  {photo.labels?.en ?? "—"}
+                </p>
+                <p className="text-zinc-500 text-xs">
+                  {photo.wins}W / {photo.losses}L
+                </p>
+              </div>
               <button
-                onClick={() => removePhoto(photo)}
-                className="w-full text-xs font-semibold py-1 bg-zinc-800 hover:bg-red-900 text-zinc-500 hover:text-red-300 transition-colors"
+                onClick={() => toggleHidden(photo)}
+                className={`w-full text-xs font-semibold py-1 transition-colors ${
+                  photo.hidden
+                    ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                    : "bg-zinc-700 hover:bg-rose-600 text-zinc-200 hover:text-white"
+                }`}
               >
-                Remove
+                {photo.hidden ? "Include" : "Exclude"}
               </button>
-            )}
-          </div>
-        ))}
+              {(photo.hidden || isBroken) && (
+                <button
+                  onClick={() => removePhoto(photo)}
+                  className="w-full text-xs font-semibold py-1 bg-zinc-800 hover:bg-red-900 text-zinc-500 hover:text-red-300 transition-colors"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
