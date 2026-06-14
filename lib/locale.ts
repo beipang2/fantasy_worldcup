@@ -1,7 +1,12 @@
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { LOCALES, DEFAULT_LOCALE, type Locale } from "./i18n";
 
 export async function getLocale(): Promise<Locale> {
+  const jar = await cookies();
+  const cookieLocale = jar.get("locale")?.value;
+  if (cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale)) {
+    return cookieLocale as Locale;
+  }
   const h = await headers();
   const accept = h.get("accept-language") ?? "";
   const preferred = accept.split(",")[0].split(";")[0].trim().slice(0, 2).toLowerCase();
