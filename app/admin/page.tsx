@@ -48,6 +48,18 @@ export default function AdminPage() {
     }
   }
 
+  async function removePhoto(photo: Photo) {
+    if (!confirm(`Remove ${photo.labels?.en ?? photo.id} permanently?`)) return;
+    const res = await fetch("/api/admin/photos", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: photo.id }),
+    });
+    if (res.ok) {
+      setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+    }
+  }
+
   const filtered = useMemo(() => {
     return photos.filter((p) => {
       const name = (p.labels?.en ?? "").toLowerCase();
@@ -159,6 +171,14 @@ export default function AdminPage() {
             >
               {photo.hidden ? "Include" : "Exclude"}
             </button>
+            {photo.hidden && (
+              <button
+                onClick={() => removePhoto(photo)}
+                className="w-full text-xs font-semibold py-1 bg-zinc-800 hover:bg-red-900 text-zinc-500 hover:text-red-300 transition-colors"
+              >
+                Remove
+              </button>
+            )}
           </div>
         ))}
       </div>
