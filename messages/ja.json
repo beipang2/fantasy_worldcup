@@ -8,6 +8,7 @@
   "nav": { "vote": "投票", "leaderboard": "ランキング" },
   "vote": {
     "round": "ラウンド",
+    "roundSuffix": "",
     "prompt": "勝ち上がるイケメンを選んで",
     "noPhotos": "写真が不足しています。",
     "noPhotosDesc": "管理者が少なくとも4枚の写真をアップロードする必要があります。"

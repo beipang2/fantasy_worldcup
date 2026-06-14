@@ -8,6 +8,7 @@
   "nav": { "vote": "Voter", "leaderboard": "Classement" },
   "vote": {
     "round": "Tour",
+    "roundSuffix": "",
     "prompt": "Choisissez qui avance",
     "noPhotos": "Pas encore assez de photos.",
     "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos."

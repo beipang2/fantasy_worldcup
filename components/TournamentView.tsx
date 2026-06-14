@@ -61,7 +61,7 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <p className="text-zinc-500 text-xs tracking-widest uppercase">
-        {t("vote.round")} {bracket.round}
+        {t("vote.round")} {bracket.round}{t("vote.roundSuffix")}
       </p>
       <p className="text-zinc-400 text-sm tracking-widest uppercase">
         {t("vote.prompt")}

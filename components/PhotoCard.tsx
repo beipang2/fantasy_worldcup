@@ -36,16 +36,10 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
         className="object-cover object-top"
         sizes="(max-width: 768px) 50vw, 50vw"
       />
-      <div
-        className={`
-          absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent
-          transition-opacity duration-200
-          ${disabled ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
-        `}
-      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" />
       {photo.label && (
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <p className="text-white font-semibold text-lg drop-shadow">{photo.label}</p>
+        <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 md:px-4 md:py-3 bg-black/60 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+          <p className="text-white font-semibold text-xs md:text-base leading-tight">{photo.label}</p>
         </div>
       )}
       {winner && (

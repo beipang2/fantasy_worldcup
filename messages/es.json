@@ -8,6 +8,7 @@
   "nav": { "vote": "Votar", "leaderboard": "Clasificación" },
   "vote": {
     "round": "Ronda",
+    "roundSuffix": "",
     "prompt": "Elige quién avanza",
     "noPhotos": "Aún no hay suficientes fotos.",
     "noPhotosDesc": "El administrador debe subir al menos 4 fotos."
