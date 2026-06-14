@@ -1,0 +1,31 @@
+{
+  "nav": { "vote": "Vote", "leaderboard": "Leaderboard" },
+  "vote": {
+    "round": "Round",
+    "prompt": "<Vote prompt>",
+    "noPhotos": "Not enough photos yet.",
+    "noPhotosDesc": "Upload at least 4 photos in the admin panel."
+  },
+  "leaderboard": {
+    "title": "<Leaderboard Title>",
+    "empty": "No photos yet.",
+    "elo": "ELO",
+    "winRate": "win rate"
+  },
+  "champion": {
+    "heading": "Your Champion",
+    "playAgain": "Play again"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "loginTitle": "Admin Login",
+    "loginButton": "Login",
+    "secretPlaceholder": "Admin secret",
+    "uploadTitle": "Upload Photo",
+    "uploadButton": "Upload",
+    "uploadingButton": "Uploading…",
+    "removeButton": "Remove",
+    "uploaded": "Uploaded!",
+    "uploadFailed": "Upload failed. Check ADMIN_SECRET and BLOB_READ_WRITE_TOKEN."
+  }
+}

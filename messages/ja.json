@@ -1,0 +1,31 @@
+{
+  "nav": { "vote": "投票", "leaderboard": "ランキング" },
+  "vote": {
+    "round": "ラウンド",
+    "prompt": "<投票プロンプト>",
+    "noPhotos": "写真が不足しています。",
+    "noPhotosDesc": "管理者が少なくとも4枚の写真をアップロードする必要があります。"
+  },
+  "leaderboard": {
+    "title": "<ランキングタイトル>",
+    "empty": "まだ写真がありません。",
+    "elo": "ELO",
+    "winRate": "勝率"
+  },
+  "champion": {
+    "heading": "あなたのチャンピオン",
+    "playAgain": "もう一度プレイ"
+  },
+  "admin": {
+    "title": "管理パネル",
+    "loginTitle": "管理者ログイン",
+    "loginButton": "ログイン",
+    "secretPlaceholder": "管理者パスワード",
+    "uploadTitle": "写真をアップロード",
+    "uploadButton": "アップロード",
+    "uploadingButton": "アップロード中…",
+    "removeButton": "削除",
+    "uploaded": "アップロード完了！",
+    "uploadFailed": "アップロードに失敗しました。"
+  }
+}

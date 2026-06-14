@@ -1,0 +1,31 @@
+{
+  "nav": { "vote": "投票", "leaderboard": "排行榜" },
+  "vote": {
+    "round": "第",
+    "prompt": "<投票提示>",
+    "noPhotos": "照片数量不足。",
+    "noPhotosDesc": "管理员需要上传至少4张照片。"
+  },
+  "leaderboard": {
+    "title": "<排行榜标题>",
+    "empty": "暂无照片。",
+    "elo": "ELO",
+    "winRate": "胜率"
+  },
+  "champion": {
+    "heading": "您的冠军",
+    "playAgain": "再玩一次"
+  },
+  "admin": {
+    "title": "管理面板",
+    "loginTitle": "管理员登录",
+    "loginButton": "登录",
+    "secretPlaceholder": "管理员密码",
+    "uploadTitle": "上传照片",
+    "uploadButton": "上传",
+    "uploadingButton": "上传中…",
+    "removeButton": "删除",
+    "uploaded": "已上传！",
+    "uploadFailed": "上传失败。"
+  }
+}

@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  labels    Json?
+  rating    Float    @default(1000)
+  wins      Int      @default(0)
+  losses    Int      @default(0)
+  hidden    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  votesAsA  Vote[]   @relation("photoA")
+  votesAsB  Vote[]   @relation("photoB")
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  photoA    Photo    @relation("photoA", fields: [photoAId], references: [id])
+  photoAId  String
+  photoB    Photo    @relation("photoB", fields: [photoBId], references: [id])
+  photoBId  String
+  winnerId  String
+  ip        String
+  createdAt DateTime @default(now())
+}

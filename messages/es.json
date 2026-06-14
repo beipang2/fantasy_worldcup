@@ -1,0 +1,31 @@
+{
+  "nav": { "vote": "Votar", "leaderboard": "Clasificación" },
+  "vote": {
+    "round": "Ronda",
+    "prompt": "<Instrucción de voto>",
+    "noPhotos": "Aún no hay suficientes fotos.",
+    "noPhotosDesc": "El administrador debe subir al menos 4 fotos."
+  },
+  "leaderboard": {
+    "title": "<Título de clasificación>",
+    "empty": "Aún no hay fotos.",
+    "elo": "ELO",
+    "winRate": "tasa de victorias"
+  },
+  "champion": {
+    "heading": "Tu Campeón",
+    "playAgain": "Jugar de nuevo"
+  },
+  "admin": {
+    "title": "Panel de administración",
+    "loginTitle": "Inicio de sesión admin",
+    "loginButton": "Iniciar sesión",
+    "secretPlaceholder": "Contraseña admin",
+    "uploadTitle": "Subir foto",
+    "uploadButton": "Subir",
+    "uploadingButton": "Subiendo…",
+    "removeButton": "Eliminar",
+    "uploaded": "¡Subido!",
+    "uploadFailed": "Error al subir."
+  }
+}

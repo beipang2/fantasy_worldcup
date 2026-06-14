@@ -1,0 +1,31 @@
+{
+  "nav": { "vote": "Voter", "leaderboard": "Classement" },
+  "vote": {
+    "round": "Tour",
+    "prompt": "<Invite à voter>",
+    "noPhotos": "Pas encore assez de photos.",
+    "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos."
+  },
+  "leaderboard": {
+    "title": "<Titre du classement>",
+    "empty": "Aucune photo pour l'instant.",
+    "elo": "ELO",
+    "winRate": "de victoires"
+  },
+  "champion": {
+    "heading": "Votre Champion",
+    "playAgain": "Rejouer"
+  },
+  "admin": {
+    "title": "Panneau d'administration",
+    "loginTitle": "Connexion administrateur",
+    "loginButton": "Connexion",
+    "secretPlaceholder": "Mot de passe admin",
+    "uploadTitle": "Téléverser une photo",
+    "uploadButton": "Téléverser",
+    "uploadingButton": "Téléversement…",
+    "removeButton": "Supprimer",
+    "uploaded": "Téléversé !",
+    "uploadFailed": "Échec du téléversement."
+  }
+}
