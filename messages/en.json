@@ -1,13 +1,18 @@
 {
+  "site": {
+    "title": "Help! I'm Surrounded by Football Hotties",
+    "name": "Help! I'm Surrounded by Football Hotties!",
+    "description": "Vote for your favourite football heartthrob"
+  },
   "nav": { "vote": "Vote", "leaderboard": "Leaderboard" },
   "vote": {
     "round": "Round",
-    "prompt": "<Vote prompt>",
+    "prompt": "Choose who advances",
     "noPhotos": "Not enough photos yet.",
     "noPhotosDesc": "Upload at least 4 photos in the admin panel."
   },
   "leaderboard": {
-    "title": "<Leaderboard Title>",
+    "title": "Global Rankings",
     "empty": "No photos yet.",
     "elo": "ELO",
     "winRate": "win rate"

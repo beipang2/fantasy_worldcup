@@ -1,13 +1,18 @@
 {
+  "site": {
+    "title": "救命 我被足坛帅哥包围了",
+    "name": "救命 我被足坛帅哥包围了",
+    "description": "投票选出你心目中最帅的足坛男神"
+  },
   "nav": { "vote": "投票", "leaderboard": "排行榜" },
   "vote": {
     "round": "第",
-    "prompt": "<投票提示>",
+    "prompt": "选择帅哥晋级",
     "noPhotos": "照片数量不足。",
     "noPhotosDesc": "管理员需要上传至少4张照片。"
   },
   "leaderboard": {
-    "title": "<排行榜标题>",
+    "title": "全球排行榜",
     "empty": "暂无照片。",
     "elo": "ELO",
     "winRate": "胜率"

@@ -1,13 +1,18 @@
 {
+  "site": {
+    "title": "Au secours ! Je suis entouré de beaux footballeurs",
+    "name": "Au secours ! Je suis entouré de beaux footballeurs",
+    "description": "Votez pour votre footballeur préféré"
+  },
   "nav": { "vote": "Voter", "leaderboard": "Classement" },
   "vote": {
     "round": "Tour",
-    "prompt": "<Invite à voter>",
+    "prompt": "Choisissez qui avance",
     "noPhotos": "Pas encore assez de photos.",
     "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos."
   },
   "leaderboard": {
-    "title": "<Titre du classement>",
+    "title": "Classement mondial",
     "empty": "Aucune photo pour l'instant.",
     "elo": "ELO",
     "winRate": "de victoires"

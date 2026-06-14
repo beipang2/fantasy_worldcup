@@ -9,7 +9,7 @@ export default function Nav() {
   return (
     <nav className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
       <Link href="/" className="text-xl font-black tracking-tight text-rose-500 hover:text-rose-400 transition-colors">
-        &lt;Site Name&gt;
+        {t("site.name")}
       </Link>
       <div className="flex gap-6 text-sm font-medium text-zinc-400">
         <Link href="/" className="hover:text-white transition-colors">{t("nav.vote")}</Link>

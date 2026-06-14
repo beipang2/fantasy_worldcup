@@ -1,13 +1,18 @@
 {
+  "site": {
+    "title": "¡Socorro! Estoy rodeada de futbolistas guapos",
+    "name": "¡Socorro! Estoy rodeada de futbolistas guapos",
+    "description": "Vota por tu futbolista favorito"
+  },
   "nav": { "vote": "Votar", "leaderboard": "Clasificación" },
   "vote": {
     "round": "Ronda",
-    "prompt": "<Instrucción de voto>",
+    "prompt": "Elige quién avanza",
     "noPhotos": "Aún no hay suficientes fotos.",
     "noPhotosDesc": "El administrador debe subir al menos 4 fotos."
   },
   "leaderboard": {
-    "title": "<Título de clasificación>",
+    "title": "Clasificación mundial",
     "empty": "Aún no hay fotos.",
     "elo": "ELO",
     "winRate": "tasa de victorias"
