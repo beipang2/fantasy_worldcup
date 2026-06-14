@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "setup": "prisma migrate deploy && prisma db seed",
-    "import:players": "ts-node --project tsconfig.seed.json prisma/import_players.ts"
+    "import:players": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json prisma/import_players.ts"
   },
   "prisma": {
     "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"

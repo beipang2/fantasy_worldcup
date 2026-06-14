@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: head2head
+      POSTGRES_DB: fantasy_worldcup
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5434:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -22,7 +22,7 @@ services:
       target: builder        # full node_modules — prisma CLI works here
     command: npx prisma migrate deploy
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/head2head
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/fantasy_worldcup
     depends_on:
       db:
         condition: service_healthy
@@ -34,9 +34,9 @@ services:
       target: runner         # slim standalone image
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3003:3000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/head2head
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/fantasy_worldcup
       ADMIN_SECRET: ${ADMIN_SECRET:-changeme}
       BLOB_READ_WRITE_TOKEN: ${BLOB_READ_WRITE_TOKEN:-}
     depends_on:

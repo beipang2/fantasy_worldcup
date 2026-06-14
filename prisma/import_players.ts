@@ -15,7 +15,9 @@ import * as path from "path";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
-const PLAYERS_JSON = path.resolve(__dirname, "../../fifa_data/data/players.json");
+const PLAYERS_JSON =
+  process.env.PLAYERS_JSON ||
+  path.resolve(__dirname, "../../fifa_data/data/players.json");
 
 interface Player {
   player_id: string;
