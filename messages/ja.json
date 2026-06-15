@@ -14,9 +14,9 @@
     "noPhotosDesc": "管理者が少なくとも4枚の写真をアップロードする必要があります。"
   },
   "leaderboard": {
-    "title": "世界ランキング",
+    "title": "みんなの成績",
     "empty": "まだ写真がありません。",
-    "elo": "ELO",
+    "matches": "試合数",
     "winRate": "勝率"
   },
   "champion": {

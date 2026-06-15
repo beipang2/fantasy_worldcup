@@ -88,9 +88,9 @@ export default function Leaderboard({ photos }: { photos: Photo[] }) {
               {/* ELO */}
               <div className="text-right flex-shrink-0">
                 <p className={`font-black text-base tabular-nums ${isTop3 ? meta!.color : "text-zinc-400"}`}>
-                  {Math.round(photo.rating)}
+                  {photo.wins + photo.losses}
                 </p>
-                <p className="text-zinc-600 text-[10px] uppercase tracking-widest">{t("leaderboard.elo")}</p>
+                <p className="text-zinc-600 text-[10px] uppercase tracking-widest">{t("leaderboard.matches")}</p>
               </div>
             </div>
           );

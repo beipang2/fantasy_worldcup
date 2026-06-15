@@ -14,9 +14,9 @@
     "noPhotosDesc": "管理员需要上传至少4张照片。"
   },
   "leaderboard": {
-    "title": "全球排行榜",
+    "title": "所有人的数据",
     "empty": "暂无照片。",
-    "elo": "ELO",
+    "matches": "场次",
     "winRate": "胜率"
   },
   "champion": {

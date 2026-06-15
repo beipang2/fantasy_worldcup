@@ -14,9 +14,9 @@
     "noPhotosDesc": "El administrador debe subir al menos 4 fotos."
   },
   "leaderboard": {
-    "title": "Clasificación mundial",
+    "title": "Estadísticas de todos",
     "empty": "Aún no hay fotos.",
-    "elo": "ELO",
+    "matches": "Partidos",
     "winRate": "tasa de victorias"
   },
   "champion": {

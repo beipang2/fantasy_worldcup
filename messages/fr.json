@@ -14,9 +14,9 @@
     "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos."
   },
   "leaderboard": {
-    "title": "Classement mondial",
+    "title": "Stats de tout le monde",
     "empty": "Aucune photo pour l'instant.",
-    "elo": "ELO",
+    "matches": "Matchs",
     "winRate": "de victoires"
   },
   "champion": {

@@ -14,9 +14,9 @@
     "noPhotosDesc": "Upload at least 4 photos in the admin panel."
   },
   "leaderboard": {
-    "title": "Global Rankings",
+    "title": "Everyone's Stats",
     "empty": "No photos yet.",
-    "elo": "ELO",
+    "matches": "Matches",
     "winRate": "win rate"
   },
   "champion": {
