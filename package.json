@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "vercel-build": "prisma migrate deploy && prisma generate && next build",
+    "build": "node node_modules/prisma/build/index.js generate && node node_modules/next/dist/bin/next build",
+    "vercel-build": "node node_modules/prisma/build/index.js migrate deploy && node node_modules/prisma/build/index.js generate && node node_modules/next/dist/bin/next build",
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint",
-    "setup": "prisma migrate deploy && prisma db seed",
+    "setup": "node node_modules/prisma/build/index.js migrate deploy && prisma db seed",
     "import:players": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json deployment/import_players.ts",
     "upload:photos": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json deployment/upload_photos.ts"
   },

@@ -1,11 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import { flagEmoji, positionAbbr } from "@/lib/playerUtils";
 
 interface Photo {
   id: string;
   url: string;
   label?: string | null;
+  position?: string | null;
+  nationality?: string | null;
+  heightCm?: number | null;
 }
 
 interface PhotoCardProps {
@@ -54,6 +58,27 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
       {!loser && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
           <div className="absolute top-0 bottom-0 w-1/3 -skew-x-12 -translate-x-full group-hover:[animation:card-shimmer_0.75s_ease-in_forwards] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        </div>
+      )}
+
+      {/* Player stats strip — top-left corner */}
+      {(photo.nationality || photo.position || photo.heightCm) && (
+        <div className="absolute top-2 left-2 flex items-center gap-1 pointer-events-none z-10">
+          <div className="flex items-center gap-1 bg-black/70 backdrop-blur-sm border border-amber-400/20 rounded-full px-2 py-0.5">
+            {photo.nationality && (
+              <span className="text-sm leading-none">{flagEmoji(photo.nationality)}</span>
+            )}
+            {photo.position && (
+              <span className="text-amber-400 font-bold text-[10px] tracking-wider leading-none">
+                {positionAbbr(photo.position)}
+              </span>
+            )}
+            {photo.heightCm && (
+              <span className="text-zinc-300 text-[10px] leading-none">
+                {photo.heightCm}cm
+              </span>
+            )}
+          </div>
         </div>
       )}
 

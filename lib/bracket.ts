@@ -2,6 +2,9 @@ export type Photo = {
   id: string;
   url: string;
   label: string | null;
+  position?: string | null;
+  nationality?: string | null;
+  heightCm?: number | null;
 };
 
 export type Match = {

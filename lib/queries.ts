@@ -5,6 +5,9 @@ export type Photo = {
   id: string;
   url: string;
   label: string | null;
+  position: string | null;
+  nationality: string | null;
+  heightCm: number | null;
 };
 
 export type RankedPhoto = Photo & {
@@ -14,16 +17,23 @@ export type RankedPhoto = Photo & {
 };
 
 function toPhoto(
-  raw: { id: string; url: string; labels: unknown },
+  raw: { id: string; url: string; labels: unknown; position?: string | null; nationality?: string | null; heightCm?: number | null },
   locale: Locale
 ): Photo {
-  return { id: raw.id, url: raw.url, label: resolveLabel(raw.labels, locale) };
+  return {
+    id: raw.id,
+    url: raw.url,
+    label: resolveLabel(raw.labels, locale),
+    position: raw.position ?? null,
+    nationality: raw.nationality ?? null,
+    heightCm: raw.heightCm ?? null,
+  };
 }
 
 export async function getPhotoPair(locale: Locale): Promise<[Photo, Photo] | null> {
   const photos = await prisma.photo.findMany({
     where: { hidden: false },
-    select: { id: true, url: true, labels: true },
+    select: { id: true, url: true, labels: true, position: true, nationality: true, heightCm: true },
   });
   if (photos.length < 2) return null;
   const shuffled = [...photos].sort(() => Math.random() - 0.5);
@@ -34,7 +44,7 @@ export async function getLeaderboard(locale: Locale): Promise<RankedPhoto[]> {
   const photos = await prisma.photo.findMany({
     where: { hidden: false },
     orderBy: { rating: "desc" },
-    select: { id: true, url: true, labels: true, rating: true, wins: true, losses: true },
+    select: { id: true, url: true, labels: true, rating: true, wins: true, losses: true, position: true, nationality: true, heightCm: true },
   });
   return photos.map((p) => ({ ...toPhoto(p, locale), rating: p.rating, wins: p.wins, losses: p.losses }));
 }

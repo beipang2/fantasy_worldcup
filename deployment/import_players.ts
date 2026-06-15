@@ -28,7 +28,10 @@ interface Player {
   short_name: string;
   jersey: number;
   position: string;
+  position_detail: string;
   birth_date: string;
+  height_cm: number;
+  weight_kg: number;
   team_slug: string;
   team_name: string;
   nationality: string;
@@ -60,10 +63,20 @@ async function main() {
       ja: p.name,
     };
 
+    const stats = {
+      position: p.position || null,
+      nationality: p.nationality || null,
+      teamName: p.team_name || null,
+      heightCm: p.height_cm ? Math.round(p.height_cm) : null,
+      weightKg: p.weight_kg ? Math.round(p.weight_kg) : null,
+      birthDate: p.birth_date || null,
+      jersey: p.jersey ?? null,
+    };
+
     await prisma.photo.upsert({
       where: { id: p.player_id },
-      update: { url: p.photo_url, labels },
-      create: { id: p.player_id, url: p.photo_url, labels },
+      update: { url: p.photo_url, labels, ...stats },
+      create: { id: p.player_id, url: p.photo_url, labels, ...stats },
     });
 
     inserted++;

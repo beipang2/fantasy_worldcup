@@ -7,16 +7,23 @@ datasource db {
 }
 
 model Photo {
-  id        String   @id @default(cuid())
-  url       String
-  labels    Json?
-  rating    Float    @default(1000)
-  wins      Int      @default(0)
-  losses    Int      @default(0)
-  hidden    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  votesAsA  Vote[]   @relation("photoA")
-  votesAsB  Vote[]   @relation("photoB")
+  id          String   @id @default(cuid())
+  url         String
+  labels      Json?
+  rating      Float    @default(1000)
+  wins        Int      @default(0)
+  losses      Int      @default(0)
+  hidden      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  position    String?
+  nationality String?
+  teamName    String?
+  heightCm    Int?
+  weightKg    Int?
+  birthDate   String?
+  jersey      Int?
+  votesAsA    Vote[]   @relation("photoA")
+  votesAsB    Vote[]   @relation("photoB")
 }
 
 model Vote {
