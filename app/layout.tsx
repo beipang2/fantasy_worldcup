@@ -31,12 +31,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} className="h-full">
-      <body className={`${fontClass(locale)} min-h-full flex flex-col bg-zinc-950 text-white antialiased`}>
+      <body className={`${fontClass(locale)} min-h-full flex flex-col antialiased`}>
         <LocaleProvider locale={locale} messages={messages}>
           <Nav />
-          <main className="flex-1 flex flex-col items-center py-10">{children}</main>
-          <footer className="text-center text-zinc-700 text-xs py-4 border-t border-zinc-900">
-            &copy; {new Date().getFullYear()} {messages.site.name}
+          <main className="flex-1 flex flex-col items-center py-10 px-4">{children}</main>
+          <footer className="text-center text-zinc-600 text-xs py-5 border-t border-white/5">
+            <span className="bg-gradient-to-r from-rose-500/60 to-amber-400/60 bg-clip-text text-transparent font-semibold">
+              {messages.site.name}
+            </span>
+            {" "}&copy; {new Date().getFullYear()}
           </footer>
         </LocaleProvider>
       </body>

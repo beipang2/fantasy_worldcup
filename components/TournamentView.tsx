@@ -67,20 +67,63 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
 
   const match = bracket.queue[0];
 
+  /* Progress: how many matches played out of total in this bracket */
+  const totalMatches = photos.length - 1;
+  const matchesPlayed = totalMatches - bracket.queue.length;
+  const progressPct = Math.round((matchesPlayed / totalMatches) * 100);
+
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
-      <p className="text-zinc-500 text-xs tracking-widest uppercase">
-        {getRoundLabel(bracket.round, bracket.totalRounds, locale)}
-      </p>
-      <p className="text-zinc-400 text-sm tracking-widest uppercase">
-        {t("vote.prompt")}
-      </p>
-      <div className="flex flex-row items-center gap-2 md:gap-8 w-full max-w-4xl px-2 md:px-4">
-        <PhotoCard photo={match.a} onClick={handleVote} disabled={!!voted} winner={voted === match.a.id} loser={voted !== null && voted !== match.a.id} />
-        <div className="flex-shrink-0">
-          <span className="text-xl md:text-4xl font-black text-zinc-600 tracking-tighter">VS</span>
+    <div className="flex flex-col items-center gap-5 w-full" style={{ animation: "slide-up 0.4s ease-out both" }}>
+      {/* Round badge */}
+      <div className="flex flex-col items-center gap-1.5">
+        <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full border border-amber-400/30 bg-amber-400/10 text-amber-400 text-xs font-black tracking-[0.2em] uppercase">
+          <span className="text-[10px]">⚡</span>
+          {getRoundLabel(bracket.round, bracket.totalRounds, locale)}
+        </span>
+        <p className="text-zinc-500 text-xs tracking-widest uppercase">{t("vote.prompt")}</p>
+      </div>
+
+      {/* Cards + VS */}
+      <div className="flex flex-row items-center gap-2 md:gap-6 w-full max-w-4xl">
+        <PhotoCard
+          photo={match.a}
+          onClick={handleVote}
+          disabled={!!voted}
+          winner={voted === match.a.id}
+          loser={voted !== null && voted !== match.a.id}
+        />
+
+        {/* VS */}
+        <div className="flex-shrink-0 flex flex-col items-center gap-1 select-none">
+          <span
+            className="text-2xl md:text-5xl font-black tracking-tighter bg-gradient-to-b from-rose-400 via-red-500 to-amber-500 bg-clip-text text-transparent leading-none"
+            style={{ animation: "vs-pulse 2.5s ease-in-out infinite", filter: "drop-shadow(0 0 12px rgba(244,63,94,0.5))" }}
+          >
+            VS
+          </span>
         </div>
-        <PhotoCard photo={match.b} onClick={handleVote} disabled={!!voted} winner={voted === match.b.id} loser={voted !== null && voted !== match.b.id} />
+
+        <PhotoCard
+          photo={match.b}
+          onClick={handleVote}
+          disabled={!!voted}
+          winner={voted === match.b.id}
+          loser={voted !== null && voted !== match.b.id}
+        />
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-full max-w-4xl px-1">
+        <div className="flex justify-between text-zinc-600 text-xs mb-1.5">
+          <span>{matchesPlayed} / {totalMatches} matches</span>
+          <span>{progressPct}%</span>
+        </div>
+        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-rose-600 to-amber-400 rounded-full transition-all duration-500"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
       </div>
     </div>
   );

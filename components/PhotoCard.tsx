@@ -21,13 +21,26 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
     <button
       onClick={() => onClick(photo.id)}
       disabled={disabled}
-      className={`
-        relative group w-full aspect-square max-w-lg rounded-2xl overflow-hidden
-        transition-all duration-300 outline-none focus-visible:ring-4 focus-visible:ring-rose-500
-        ${disabled ? "cursor-default" : "cursor-pointer hover:scale-[1.02] hover:shadow-2xl hover:shadow-rose-900/30"}
-        ${winner ? "ring-4 ring-rose-500 scale-[1.02]" : ""}
-        ${loser ? "opacity-40" : ""}
-      `}
+      style={
+        winner
+          ? { animation: "pulse-glow-gold 1.8s ease-in-out infinite" }
+          : undefined
+      }
+      className={[
+        "relative group w-full aspect-square max-w-lg rounded-2xl overflow-hidden",
+        "outline-none focus-visible:ring-4 focus-visible:ring-amber-400",
+        "border-2 transition-all duration-300",
+        disabled && !winner && !loser ? "cursor-default" : "",
+        !disabled
+          ? "cursor-pointer hover:scale-[1.03] hover:-translate-y-1 hover:shadow-2xl"
+          : "",
+        winner
+          ? "border-amber-400 scale-[1.02] -translate-y-1 shadow-2xl shadow-amber-400/50 z-10"
+          : "border-white/10 hover:border-rose-500/50 hover:shadow-rose-500/25",
+        loser ? "opacity-25 grayscale scale-[0.97] saturate-0" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <Image
         src={photo.url}
@@ -36,16 +49,36 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
         className="object-cover object-top scale-[2.2] md:scale-100 origin-top"
         sizes="(max-width: 768px) 50vw, 50vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" />
-      {photo.label && (
-        <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 md:px-4 md:py-3 bg-black/60 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
-          <p className="text-white font-semibold text-xs md:text-base leading-tight">{photo.label}</p>
+
+      {/* Hover shimmer sweep */}
+      {!loser && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
+          <div className="absolute top-0 bottom-0 w-1/3 -skew-x-12 -translate-x-full group-hover:[animation:card-shimmer_0.75s_ease-in_forwards] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </div>
       )}
-      {winner && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg">
-          Winner!
+
+      {/* Bottom gradient overlay — always on mobile, hover on desktop */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+
+      {/* Label */}
+      {photo.label && (
+        <div className="absolute bottom-0 left-0 right-0 px-3 py-2 md:px-4 md:py-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+          <p className="text-white font-bold text-xs md:text-base leading-tight drop-shadow-lg">
+            {photo.label}
+          </p>
         </div>
+      )}
+
+      {/* Winner badge */}
+      {winner && (
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-yellow-300 text-black text-xs font-black px-4 py-1.5 rounded-full shadow-lg tracking-widest uppercase whitespace-nowrap">
+          ✓ Winner
+        </div>
+      )}
+
+      {/* Corner accent on hover (non-loser) */}
+      {!loser && !winner && (
+        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       )}
     </button>
   );

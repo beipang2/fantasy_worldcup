@@ -12,9 +12,14 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="flex flex-col items-center gap-8 w-full">
-      <h1 className="text-4xl font-black tracking-tight">{messages.leaderboard.title}</h1>
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-3xl select-none" role="img" aria-label="trophy">🏆</span>
+        <h1 className="text-4xl font-black tracking-tight bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent">
+          {messages.leaderboard.title}
+        </h1>
+      </div>
       {photos.length === 0 ? (
-        <p className="text-zinc-500">{messages.leaderboard.empty}</p>
+        <p className="text-zinc-600 text-sm">{messages.leaderboard.empty}</p>
       ) : (
         <Leaderboard photos={photos} />
       )}
