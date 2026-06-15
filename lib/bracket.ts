@@ -73,5 +73,5 @@ export function advance(state: BracketState, winner: Photo): BracketState {
     nextQueue.push({ a: winners[i], b: winners[i + 1] });
   }
 
-  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds, matchesPlayed, advancedPhotos };
+  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds, matchesPlayed, advancedPhotos: [] };
 }

@@ -19,7 +19,13 @@ function getRoundLabel(round: number, totalRounds: number, locale: Locale): stri
   return EN_ROUND_LABELS[roundsFromEnd] ?? `Round ${round}`;
 }
 
-export default function TournamentView({ photos, locale }: { photos: Photo[]; locale: Locale }) {
+interface RankedPhoto extends Photo {
+  rating?: number;
+  wins?: number;
+  losses?: number;
+}
+
+export default function TournamentView({ photos, locale }: { photos: RankedPhoto[]; locale: Locale }) {
   const { t } = useLocale();
   const [bracket, setBracket] = useState<BracketState | null>(null);
   const [voted, setVoted] = useState<string | null>(null);
@@ -64,11 +70,23 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
   }
 
   if (!bracket) return null;
-  if (bracket.champion) return <Champion photo={bracket.champion} onRestart={restart} />;
+
+  if (bracket.champion) {
+    const dbPhoto = photos.find((p) => p.id === bracket.champion!.id);
+    const stats =
+      dbPhoto?.wins !== undefined
+        ? {
+            wins: dbPhoto.wins,
+            losses: dbPhoto.losses ?? 0,
+            rating: dbPhoto.rating ?? 1000,
+            sessionWins: bracket.totalRounds,
+          }
+        : undefined;
+    return <Champion photo={bracket.champion} onRestart={restart} stats={stats} />;
+  }
 
   const match = bracket.queue[0];
 
-  /* Progress: matchesPlayed is tracked in bracket state; total is always n-1 */
   const totalMatches = photos.length - 1;
   const progressPct = Math.round((bracket.matchesPlayed / totalMatches) * 100);
 
@@ -93,7 +111,6 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
           loser={voted !== null && voted !== match.a.id}
         />
 
-        {/* VS */}
         <div className="flex-shrink-0 flex flex-col items-center gap-1 select-none">
           <span
             className="text-2xl md:text-5xl font-black tracking-tighter bg-gradient-to-b from-rose-400 via-red-500 to-amber-500 bg-clip-text text-transparent leading-none"
@@ -126,18 +143,18 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
         </div>
       </div>
 
-      {/* Your picks so far */}
+      {/* This round's picks — resets each round */}
       {bracket.advancedPhotos.length > 0 && (
         <div className="w-full max-w-4xl px-1">
           <p className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase mb-2">
             Your picks
           </p>
-          <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex flex-wrap gap-2.5">
             {bracket.advancedPhotos.map((photo, i) => (
               <div
                 key={`${photo.id}-${i}`}
-                className="flex-shrink-0 flex flex-col items-center gap-1 w-14"
-                style={{ animation: `slide-up 0.3s ease-out both` }}
+                className="flex flex-col items-center gap-1 w-14"
+                style={{ animation: "slide-up 0.3s ease-out both" }}
               >
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden ring-1 ring-amber-400/40 bg-zinc-900">
                   <Image
