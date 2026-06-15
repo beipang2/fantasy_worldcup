@@ -87,7 +87,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
 
   const match = bracket.queue[0];
 
-  const totalMatches = photos.length - 1;
+  const totalMatches = (1 << bracket.totalRounds) - 1;
   const progressPct = Math.round((bracket.matchesPlayed / totalMatches) * 100);
 
   return (
