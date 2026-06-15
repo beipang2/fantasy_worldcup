@@ -33,7 +33,7 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
         src={photo.url}
         alt={photo.label ?? "Photo"}
         fill
-        className="object-cover object-top scale-125 md:scale-100 origin-top"
+        className="object-cover object-top scale-[1.6] md:scale-100 origin-top"
         sizes="(max-width: 768px) 50vw, 50vw"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" />
