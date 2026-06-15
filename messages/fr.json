@@ -16,7 +16,7 @@
   "leaderboard": {
     "title": "Stats de tout le monde",
     "empty": "Aucune photo pour l'instant.",
-    "matches": "Matchs",
+    "matches": "Apparitions",
     "winRate": "de victoires"
   },
   "champion": {

@@ -16,7 +16,7 @@
   "leaderboard": {
     "title": "みんなの成績",
     "empty": "まだ写真がありません。",
-    "matches": "試合数",
+    "matches": "登場回数",
     "winRate": "勝率"
   },
   "champion": {

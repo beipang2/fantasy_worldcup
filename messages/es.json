@@ -16,7 +16,7 @@
   "leaderboard": {
     "title": "Estadísticas de todos",
     "empty": "Aún no hay fotos.",
-    "matches": "Partidos",
+    "matches": "Apariciones",
     "winRate": "tasa de victorias"
   },
   "champion": {

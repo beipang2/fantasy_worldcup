@@ -16,7 +16,7 @@
   "leaderboard": {
     "title": "所有人的数据",
     "empty": "暂无照片。",
-    "matches": "场次",
+    "matches": "出场次数",
     "winRate": "胜率"
   },
   "champion": {
