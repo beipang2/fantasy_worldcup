@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import Image from "next/image";
 import PhotoCard from "./PhotoCard";
 import Champion from "./Champion";
 import { useLocale } from "./LocaleProvider";
@@ -124,6 +125,37 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
           />
         </div>
       </div>
+
+      {/* Your picks so far */}
+      {bracket.advancedPhotos.length > 0 && (
+        <div className="w-full max-w-4xl px-1">
+          <p className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase mb-2">
+            Your picks
+          </p>
+          <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+            {bracket.advancedPhotos.map((photo, i) => (
+              <div
+                key={`${photo.id}-${i}`}
+                className="flex-shrink-0 flex flex-col items-center gap-1 w-14"
+                style={{ animation: `slide-up 0.3s ease-out both` }}
+              >
+                <div className="relative w-12 h-12 rounded-xl overflow-hidden ring-1 ring-amber-400/40 bg-zinc-900">
+                  <Image
+                    src={photo.url}
+                    alt={photo.label ?? "Pick"}
+                    fill
+                    className="object-cover object-top scale-[2.2] md:scale-100 origin-top"
+                    sizes="48px"
+                  />
+                </div>
+                <p className="text-zinc-500 text-[9px] leading-tight text-center line-clamp-2 w-full">
+                  {photo.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

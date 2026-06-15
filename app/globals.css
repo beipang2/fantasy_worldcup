@@ -54,6 +54,10 @@ body {
   min-height: 100vh;
 }
 
+/* Hide scrollbar utility (used on picks row) */
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0a0a18; }
