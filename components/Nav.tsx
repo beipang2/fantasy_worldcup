@@ -24,10 +24,6 @@ export default function Nav() {
 
       {/* Right side links */}
       <div className="flex items-center gap-5 text-sm font-medium">
-        <Link href="/" className="relative group text-zinc-400 hover:text-white transition-colors duration-200">
-          {t("nav.vote")}
-          <span className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full bg-gradient-to-r from-rose-500 to-amber-400 transition-all duration-300" />
-        </Link>
         <Link href="/leaderboard" className="relative group text-zinc-400 hover:text-white transition-colors duration-200">
           {t("nav.leaderboard")}
           <span className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full bg-gradient-to-r from-rose-500 to-amber-400 transition-all duration-300" />
