@@ -51,9 +51,12 @@ export default function Champion({
         logging: false,
       });
 
+      console.log(`[Champion] Canvas: ${canvas.width}×${canvas.height}`);
+
       const blob = await new Promise<Blob>((res, rej) =>
         canvas.toBlob((b) => (b ? res(b) : rej(new Error("toBlob failed"))), "image/png")
       );
+      console.log(`[Champion] Blob: ${(blob.size / 1024).toFixed(1)} KB`);
 
       const filename = `${(photo.label ?? "champion").replace(/\s+/g, "-").toLowerCase()}-champion.png`;
       const file = new File([blob], filename, { type: "image/png" });
@@ -61,15 +64,20 @@ export default function Champion({
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: photo.label ?? "My Champion" });
       } else {
+        // Anchor must be in the DOM before .click() for Firefox + Safari
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download = filename;
+        a.style.display = "none";
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        // Revoke after the browser has had time to start the download
+        setTimeout(() => URL.revokeObjectURL(url), 100);
       }
     } catch (e) {
-      console.error("Save failed", e);
+      console.error("[Champion] Save as Image failed:", e);
     } finally {
       setSaving(false);
     }
