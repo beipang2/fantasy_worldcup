@@ -16,8 +16,11 @@ vi.mock("@/components/LocaleProvider", () => ({
 }));
 
 vi.mock("@/components/Champion", () => ({
-  default: ({ photo }: { photo: { label: string | null } }) => (
-    <div data-testid="champion">{photo.label}</div>
+  default: ({ photo, onRestart }: { photo: { label: string | null }; onRestart: () => void }) => (
+    <div data-testid="champion">
+      {photo.label}
+      <button onClick={onRestart}>Play Again</button>
+    </div>
   ),
 }));
 
@@ -122,5 +125,43 @@ describe("TournamentView – picks grid", () => {
     await waitFor(() => expect(screen.queryByText("Your picks")).toBeNull(), {
       timeout: 2000,
     });
+  });
+});
+
+describe("TournamentView – Play Again", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response()));
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    sessionStorage.clear();
+  });
+
+  it("Play Again resets the bracket and saves new bracket to sessionStorage", async () => {
+    // Complete a 4-player bracket (3 total matches: 2 in round 1, 1 final)
+    await renderView(4);
+
+    // Vote through 2 round-1 matches and the final
+    for (let expected = 1; expected <= 3; expected++) {
+      fireEvent.click(screen.getAllByRole("button")[0]);
+      if (expected < 3) {
+        // Wait for match counter to increment before voting again
+        await waitFor(() => screen.getByText(new RegExp(`${expected} \\/ 3 matches`)), { timeout: 2000 });
+      }
+    }
+
+    await waitFor(() => screen.getByTestId("champion"), { timeout: 2000 });
+
+    const savedBefore = JSON.parse(sessionStorage.getItem("h2h_bracket")!);
+    expect(savedBefore.champion).not.toBeNull();
+
+    fireEvent.click(screen.getByText("Play Again"));
+
+    await waitFor(() => expect(screen.queryByTestId("champion")).toBeNull(), { timeout: 2000 });
+
+    const savedAfter = JSON.parse(sessionStorage.getItem("h2h_bracket")!);
+    expect(savedAfter.matchesPlayed).toBe(0);
+    expect(savedAfter.champion).toBeNull();
   });
 });

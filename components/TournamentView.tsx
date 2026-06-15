@@ -65,8 +65,9 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   );
 
   function restart() {
-    sessionStorage.removeItem(STORAGE_KEY);
-    setBracket(buildBracket(photos));
+    const fresh = buildBracket(photos);
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+    setBracket(fresh);
   }
 
   if (!bracket) return null;

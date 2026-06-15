@@ -125,6 +125,24 @@ describe("advance – champion", () => {
   });
 });
 
+describe("replay variety", () => {
+  it("picks different player sets across replays when pool > 16", () => {
+    const pool = makePhotos(32);
+    const ids1 = new Set(buildBracket(pool).queue.flatMap((m) => [m.a.id, m.b.id]));
+    const ids2 = new Set(buildBracket(pool).queue.flatMap((m) => [m.a.id, m.b.id]));
+    // With 32 players choosing 16, probability of identical sets is astronomically small
+    expect([...ids1].sort()).not.toEqual([...ids2].sort());
+  });
+
+  it("always picks exactly bracket-size players, never duplicates", () => {
+    const pool = makePhotos(32);
+    const bracket = buildBracket(pool);
+    const ids = bracket.queue.flatMap((m) => [m.a.id, m.b.id]);
+    expect(ids.length).toBe(16);
+    expect(new Set(ids).size).toBe(16);
+  });
+});
+
 describe("totalMatches formula", () => {
   it("(1 << totalRounds) - 1 gives correct match count for any bracket size", () => {
     const cases = [
