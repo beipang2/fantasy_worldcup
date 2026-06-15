@@ -93,13 +93,26 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
 
   return (
     <div className="flex flex-col items-center gap-5 w-full" style={{ animation: "slide-up 0.4s ease-out both" }}>
-      {/* Round badge */}
-      <div className="flex flex-col items-center gap-1.5">
-        <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full border border-amber-400/30 bg-amber-400/10 text-amber-400 text-xs font-black tracking-[0.2em] uppercase">
-          <span className="text-[10px]">⚡</span>
-          {getRoundLabel(bracket.round, bracket.totalRounds, locale)}
-        </span>
-        <p className="text-zinc-500 text-xs tracking-widest uppercase">{t("vote.prompt")}</p>
+      {/* Round announcement */}
+      <div className="flex flex-col items-center gap-2 w-full">
+        {/* Stage label */}
+        <p className="text-zinc-600 text-[10px] font-semibold tracking-[0.3em] uppercase">
+          ⚡ Now Playing
+        </p>
+
+        {/* Big gradient round title */}
+        <div className="relative flex flex-col items-center">
+          <h2
+            className="text-3xl md:text-5xl font-black tracking-tight text-center bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent leading-none pb-1"
+            style={{ filter: "drop-shadow(0 0 18px rgba(251,191,36,0.45))" }}
+          >
+            {getRoundLabel(bracket.round, bracket.totalRounds, locale)}
+          </h2>
+          {/* Decorative shimmer underline */}
+          <span className="mt-1.5 block h-px w-3/4 rounded-full bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+        </div>
+
+        <p className="text-zinc-500 text-xs tracking-[0.2em] uppercase">{t("vote.prompt")}</p>
       </div>
 
       {/* Cards + VS */}
