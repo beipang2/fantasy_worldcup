@@ -17,6 +17,7 @@ export type BracketState = {
   /** The overall champion once bracket is complete */
   champion: Photo | null;
   round: number;
+  totalRounds: number;
 };
 
 /** Nearest power of 2 that is ≤ n */
@@ -35,7 +36,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 /** Build the initial bracket from a list of photos. */
 export function buildBracket(photos: Photo[]): BracketState {
-  const size = Math.min(floorPow2(photos.length), 32);
+  const size = Math.min(floorPow2(photos.length), 16);
   const seeded = shuffle(photos).slice(0, size);
 
   const queue: Match[] = [];
@@ -43,7 +44,8 @@ export function buildBracket(photos: Photo[]): BracketState {
     queue.push({ a: seeded[i], b: seeded[i + 1] });
   }
 
-  return { queue, winners: [], champion: null, round: 1 };
+  const totalRounds = Math.log2(size);
+  return { queue, winners: [], champion: null, round: 1, totalRounds };
 }
 
 /** Advance the bracket after a match. Returns the next state. */
@@ -66,5 +68,5 @@ export function advance(state: BracketState, winner: Photo): BracketState {
     nextQueue.push({ a: winners[i], b: winners[i + 1] });
   }
 
-  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1 };
+  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds };
 }

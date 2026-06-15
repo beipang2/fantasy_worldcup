@@ -9,6 +9,15 @@ import type { Locale } from "@/lib/i18n";
 
 const STORAGE_KEY = "h2h_bracket";
 
+const ZH_ROUND_LABELS: Record<number, string> = { 1: "决赛", 2: "半决赛", 3: "8强", 4: "16强" };
+const EN_ROUND_LABELS: Record<number, string> = { 1: "Final", 2: "Semifinals", 3: "Quarterfinals", 4: "Round of 16" };
+
+function getRoundLabel(round: number, totalRounds: number, locale: Locale): string {
+  const roundsFromEnd = totalRounds - round + 1;
+  if (locale === "zh") return ZH_ROUND_LABELS[roundsFromEnd] ?? `第 ${round} 轮`;
+  return EN_ROUND_LABELS[roundsFromEnd] ?? `Round ${round}`;
+}
+
 export default function TournamentView({ photos, locale }: { photos: Photo[]; locale: Locale }) {
   const { t } = useLocale();
   const [bracket, setBracket] = useState<BracketState | null>(null);
@@ -61,7 +70,7 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <p className="text-zinc-500 text-xs tracking-widest uppercase">
-        {t("vote.round")} {bracket.round}{t("vote.roundSuffix")}
+        {getRoundLabel(bracket.round, bracket.totalRounds, locale)}
       </p>
       <p className="text-zinc-400 text-sm tracking-widest uppercase">
         {t("vote.prompt")}
