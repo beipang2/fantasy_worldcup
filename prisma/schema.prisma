@@ -18,10 +18,11 @@ model Photo {
   position    String?
   nationality String?
   teamName    String?
-  heightCm    Int?
-  weightKg    Int?
-  birthDate   String?
-  jersey      Int?
+  heightCm      Int?
+  weightKg      Int?
+  birthDate     String?
+  jersey        Int?
+  overallRating Int?
   votesAsA    Vote[]   @relation("photoA")
   votesAsB    Vote[]   @relation("photoB")
 }

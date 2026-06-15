@@ -5,6 +5,8 @@ export type Photo = {
   position?: string | null;
   nationality?: string | null;
   heightCm?: number | null;
+  birthDate?: string | null;
+  overallRating?: number | null;
 };
 
 export type Match = {

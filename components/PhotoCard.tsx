@@ -10,6 +10,8 @@ interface Photo {
   position?: string | null;
   nationality?: string | null;
   heightCm?: number | null;
+  birthDate?: string | null;
+  overallRating?: number | null;
 }
 
 interface PhotoCardProps {
@@ -21,7 +23,10 @@ interface PhotoCardProps {
 }
 
 export default function PhotoCard({ photo, onClick, disabled, winner, loser }: PhotoCardProps) {
-  const hasStats = photo.nationality || photo.position || photo.heightCm;
+  const hasStats = photo.nationality || photo.position || photo.heightCm || photo.birthDate;
+  const age = photo.birthDate
+    ? Math.floor((Date.now() - new Date(photo.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+    : null;
 
   return (
     <button
@@ -77,6 +82,40 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
           </div>
         )}
 
+        {/* Overall rating badge — EA FC style, top-left */}
+        {photo.overallRating != null && (
+          <div className="absolute top-2 left-2 flex flex-col items-center leading-none select-none pointer-events-none">
+            <span
+              className={[
+                "text-xl md:text-2xl font-black drop-shadow-lg",
+                photo.overallRating >= 85
+                  ? "text-amber-300"
+                  : photo.overallRating >= 75
+                  ? "text-slate-300"
+                  : "text-amber-700",
+              ].join(" ")}
+              style={{ textShadow: "0 1px 4px rgba(0,0,0,0.9)" }}
+            >
+              {photo.overallRating}
+            </span>
+            {photo.position && (
+              <span
+                className={[
+                  "text-[9px] font-bold tracking-wider uppercase",
+                  photo.overallRating >= 85
+                    ? "text-amber-300"
+                    : photo.overallRating >= 75
+                    ? "text-slate-300"
+                    : "text-amber-700",
+                ].join(" ")}
+                style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}
+              >
+                {positionAbbr(photo.position)}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Winner badge */}
         {winner && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-yellow-300 text-black text-xs font-black px-4 py-1.5 rounded-full shadow-lg tracking-widest uppercase whitespace-nowrap">
@@ -101,9 +140,10 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser }: P
               {positionAbbr(photo.position)}
             </span>
           )}
-          {photo.heightCm && (
-            <span className="text-zinc-400 text-[10px] leading-none ml-auto">
-              {photo.heightCm} cm
+          {(photo.heightCm || age) && (
+            <span className="text-zinc-400 text-[10px] leading-none ml-auto flex gap-1.5">
+              {age && <span>{age}y</span>}
+              {photo.heightCm && <span>{photo.heightCm} cm</span>}
             </span>
           )}
         </div>
