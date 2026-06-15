@@ -60,7 +60,7 @@ export function advance(state: BracketState, winner: Photo): BracketState {
 
   // Round over — champion or build next round
   if (winners.length === 1) {
-    return { queue: [], winners: [], champion: winners[0], round: state.round };
+    return { queue: [], winners: [], champion: winners[0], round: state.round, totalRounds: state.totalRounds };
   }
 
   const nextQueue: Match[] = [];
