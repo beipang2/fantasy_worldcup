@@ -50,6 +50,11 @@
   50%       { text-shadow: 0 0 40px rgba(244,63,94,0.9), 0 0 80px rgba(245,158,11,0.5); }
 }
 
+@keyframes bracket-in {
+  from { opacity: 0; transform: scale(0.5) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 body {
   background: #05050f;
   background-image:

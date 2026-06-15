@@ -42,6 +42,18 @@ describe("buildBracket", () => {
     expect(b.round).toBe(1);
   });
 
+  it("initialises history as empty arrays, one per round", () => {
+    const b4 = buildBracket(makePhotos(16));
+    expect(b4.history).toHaveLength(4);
+    b4.history.forEach((arr) => expect(arr).toHaveLength(0));
+
+    const b3 = buildBracket(makePhotos(8));
+    expect(b3.history).toHaveLength(3);
+
+    const b2 = buildBracket(makePhotos(4));
+    expect(b2.history).toHaveLength(2);
+  });
+
   it("totalRounds matches log2 of bracket size", () => {
     expect(buildBracket(makePhotos(4)).totalRounds).toBe(2);
     expect(buildBracket(makePhotos(8)).totalRounds).toBe(3);
@@ -73,6 +85,41 @@ describe("advance – within a round", () => {
     expect(b.queue).toHaveLength(3);
     b = advance(b, b.queue[0].a);
     expect(b.queue).toHaveLength(2);
+  });
+
+  it("appends winner to history[round-1] on each vote", () => {
+    let b = buildBracket(makePhotos(4));
+    const w1 = b.queue[0].a;
+    b = advance(b, w1);
+    expect(b.history[0]).toEqual([w1]);
+    expect(b.history[1]).toHaveLength(0); // round 2 untouched
+
+    const w2 = b.queue[0].a;
+    b = advance(b, w2); // ends round 1, starts round 2
+    expect(b.history[0]).toEqual([w1, w2]); // round 1 complete
+    expect(b.history[1]).toHaveLength(0);   // round 2 not started yet
+  });
+
+  it("history persists across round transitions", () => {
+    let b = buildBracket(makePhotos(8)); // 3 rounds: 4 R1 matches, 2 R2, 1 R3
+    // Play all 4 round-1 matches
+    for (let i = 0; i < 4; i++) b = advance(b, b.queue[0].a);
+    expect(b.round).toBe(2);
+    expect(b.history[0]).toHaveLength(4); // 4 round-1 winners recorded
+
+    // Play all 2 round-2 matches
+    for (let i = 0; i < 2; i++) b = advance(b, b.queue[0].a);
+    expect(b.round).toBe(3);
+    expect(b.history[0]).toHaveLength(4); // round 1 still intact
+    expect(b.history[1]).toHaveLength(2); // 2 round-2 winners recorded
+  });
+
+  it("history[r] contains only winners from round r+1, not all players", () => {
+    let b = buildBracket(makePhotos(4));
+    const w1 = b.queue[0].b; // pick .b explicitly
+    b = advance(b, w1);
+    expect(b.history[0]).toContainEqual(w1);
+    expect(b.history[0]).toHaveLength(1);
   });
 });
 

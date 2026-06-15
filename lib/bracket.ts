@@ -24,8 +24,10 @@ export type BracketState = {
   round: number;
   totalRounds: number;
   matchesPlayed: number;
-  /** All picks so far, newest first — never resets between rounds */
+  /** Current round picks only, newest first — resets at round boundary */
   advancedPhotos: Photo[];
+  /** Per-round winner history. history[r] holds winners from round (r+1). Persists across rounds. */
+  history: Photo[][];
 };
 
 /** Nearest power of 2 that is ≤ n */
@@ -53,7 +55,8 @@ export function buildBracket(photos: Photo[]): BracketState {
   }
 
   const totalRounds = Math.log2(size);
-  return { queue, winners: [], champion: null, round: 1, totalRounds, matchesPlayed: 0, advancedPhotos: [] };
+  const history: Photo[][] = Array.from({ length: totalRounds }, () => []);
+  return { queue, winners: [], champion: null, round: 1, totalRounds, matchesPlayed: 0, advancedPhotos: [], history };
 }
 
 /** Advance the bracket after a match. Returns the next state. */
@@ -63,14 +66,19 @@ export function advance(state: BracketState, winner: Photo): BracketState {
   const matchesPlayed = state.matchesPlayed + 1;
   const advancedPhotos = [winner, ...state.advancedPhotos];
 
+  // Update history for current round (round is 1-indexed; history is 0-indexed)
+  const history = state.history.map((arr, i) =>
+    i === state.round - 1 ? [...arr, winner] : arr
+  );
+
   // More matches in this round
   if (queue.length > 0) {
-    return { ...state, queue, winners, matchesPlayed, advancedPhotos };
+    return { ...state, queue, winners, matchesPlayed, advancedPhotos, history };
   }
 
   // Round over — champion or build next round
   if (winners.length === 1) {
-    return { queue: [], winners: [], champion: winners[0], round: state.round, totalRounds: state.totalRounds, matchesPlayed, advancedPhotos };
+    return { queue: [], winners: [], champion: winners[0], round: state.round, totalRounds: state.totalRounds, matchesPlayed, advancedPhotos, history };
   }
 
   const nextQueue: Match[] = [];
@@ -78,5 +86,5 @@ export function advance(state: BracketState, winner: Photo): BracketState {
     nextQueue.push({ a: winners[i], b: winners[i + 1] });
   }
 
-  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds, matchesPlayed, advancedPhotos: [] };
+  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds, matchesPlayed, advancedPhotos: [], history };
 }

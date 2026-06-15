@@ -6,6 +6,7 @@ import PhotoCard from "./PhotoCard";
 import Champion from "./Champion";
 import { useLocale } from "./LocaleProvider";
 import { buildBracket, advance, type Photo, type BracketState } from "@/lib/bracket";
+import BracketView from "./BracketView";
 import type { Locale } from "@/lib/i18n";
 
 const STORAGE_KEY = "h2h_bracket";
@@ -41,7 +42,15 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
-      if (saved) { setBracket(JSON.parse(saved)); return; }
+      if (saved) {
+        const parsed: BracketState = JSON.parse(saved);
+        // Back-fill history for sessions saved before this field existed
+        if (!parsed.history) {
+          parsed.history = Array.from({ length: parsed.totalRounds }, () => []);
+        }
+        setBracket(parsed);
+        return;
+      }
     } catch {}
     const initial = buildBracket(photos);
     setBracket(initial);
@@ -171,6 +180,9 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           />
         </div>
       </div>
+
+      {/* Bracket tree */}
+      <BracketView bracket={bracket} locale={locale} />
 
       {/* This round's picks — resets each round */}
       {bracket.advancedPhotos.length > 0 && (
