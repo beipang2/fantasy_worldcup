@@ -18,6 +18,7 @@ export type BracketState = {
   champion: Photo | null;
   round: number;
   totalRounds: number;
+  matchesPlayed: number;
 };
 
 /** Nearest power of 2 that is ≤ n */
@@ -45,22 +46,23 @@ export function buildBracket(photos: Photo[]): BracketState {
   }
 
   const totalRounds = Math.log2(size);
-  return { queue, winners: [], champion: null, round: 1, totalRounds };
+  return { queue, winners: [], champion: null, round: 1, totalRounds, matchesPlayed: 0 };
 }
 
 /** Advance the bracket after a match. Returns the next state. */
 export function advance(state: BracketState, winner: Photo): BracketState {
   const queue = state.queue.slice(1);
   const winners = [...state.winners, winner];
+  const matchesPlayed = state.matchesPlayed + 1;
 
   // More matches in this round
   if (queue.length > 0) {
-    return { ...state, queue, winners };
+    return { ...state, queue, winners, matchesPlayed };
   }
 
   // Round over — champion or build next round
   if (winners.length === 1) {
-    return { queue: [], winners: [], champion: winners[0], round: state.round, totalRounds: state.totalRounds };
+    return { queue: [], winners: [], champion: winners[0], round: state.round, totalRounds: state.totalRounds, matchesPlayed };
   }
 
   const nextQueue: Match[] = [];
@@ -68,5 +70,5 @@ export function advance(state: BracketState, winner: Photo): BracketState {
     nextQueue.push({ a: winners[i], b: winners[i + 1] });
   }
 
-  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds };
+  return { queue: nextQueue, winners: [], champion: null, round: state.round + 1, totalRounds: state.totalRounds, matchesPlayed };
 }

@@ -67,10 +67,9 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
 
   const match = bracket.queue[0];
 
-  /* Progress: how many matches played out of total in this bracket */
+  /* Progress: matchesPlayed is tracked in bracket state; total is always n-1 */
   const totalMatches = photos.length - 1;
-  const matchesPlayed = totalMatches - bracket.queue.length;
-  const progressPct = Math.round((matchesPlayed / totalMatches) * 100);
+  const progressPct = Math.round((bracket.matchesPlayed / totalMatches) * 100);
 
   return (
     <div className="flex flex-col items-center gap-5 w-full" style={{ animation: "slide-up 0.4s ease-out both" }}>
@@ -115,7 +114,7 @@ export default function TournamentView({ photos, locale }: { photos: Photo[]; lo
       {/* Progress bar */}
       <div className="w-full max-w-4xl px-1">
         <div className="flex justify-between text-zinc-600 text-xs mb-1.5">
-          <span>{matchesPlayed} / {totalMatches} matches</span>
+          <span>{bracket.matchesPlayed} / {totalMatches} matches</span>
           <span>{progressPct}%</span>
         </div>
         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
