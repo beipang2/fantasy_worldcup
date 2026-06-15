@@ -25,6 +25,14 @@ interface RankedPhoto extends Photo {
   losses?: number;
 }
 
+// Color scheme per stage (roundsFromEnd: 4=R16, 3=QF, 2=SF, 1=Final)
+const ROUND_STYLES: Record<number, { gradient: string; glow: string; line: string }> = {
+  4: { gradient: "from-cyan-300 via-blue-200 to-cyan-400",        glow: "rgba(34,211,238,0.5)",   line: "rgba(34,211,238,0.65)"  },
+  3: { gradient: "from-emerald-300 via-green-200 to-emerald-400", glow: "rgba(52,211,153,0.5)",   line: "rgba(52,211,153,0.65)"  },
+  2: { gradient: "from-orange-300 via-rose-300 to-orange-400",    glow: "rgba(251,113,133,0.55)", line: "rgba(251,113,133,0.65)" },
+  1: { gradient: "from-amber-300 via-yellow-200 to-amber-400",    glow: "rgba(251,191,36,0.5)",   line: "rgba(251,191,36,0.65)"  },
+};
+
 export default function TournamentView({ photos, locale }: { photos: RankedPhoto[]; locale: Locale }) {
   const { t } = useLocale();
   const [bracket, setBracket] = useState<BracketState | null>(null);
@@ -87,6 +95,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   }
 
   const match = bracket.queue[0];
+  const roundsFromEnd = bracket.totalRounds - bracket.round + 1;
+  const roundStyle = ROUND_STYLES[roundsFromEnd] ?? ROUND_STYLES[1];
 
   const totalMatches = (1 << bracket.totalRounds) - 1;
   const progressPct = Math.round((bracket.matchesPlayed / totalMatches) * 100);
@@ -95,21 +105,26 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     <div className="flex flex-col items-center gap-5 w-full" style={{ animation: "slide-up 0.4s ease-out both" }}>
       {/* Round announcement */}
       <div className="flex flex-col items-center gap-2 w-full">
-        {/* Stage label */}
         <p className="text-zinc-600 text-[10px] font-semibold tracking-[0.3em] uppercase">
           ⚡ Now Playing
         </p>
 
-        {/* Big gradient round title */}
-        <div className="relative flex flex-col items-center">
+        {/* key=round remounts this element each round → CSS animation replays */}
+        <div
+          key={bracket.round}
+          className="relative flex flex-col items-center"
+          style={{ animation: "round-reveal 0.55s cubic-bezier(0.34,1.56,0.64,1) both" }}
+        >
           <h2
-            className="text-3xl md:text-5xl font-black tracking-tight text-center bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent leading-none pb-1"
-            style={{ filter: "drop-shadow(0 0 18px rgba(251,191,36,0.45))" }}
+            className={`text-3xl md:text-5xl font-black tracking-tight text-center bg-gradient-to-r ${roundStyle.gradient} bg-clip-text text-transparent leading-none pb-1`}
+            style={{ filter: `drop-shadow(0 0 20px ${roundStyle.glow})` }}
           >
             {getRoundLabel(bracket.round, bracket.totalRounds, locale)}
           </h2>
-          {/* Decorative shimmer underline */}
-          <span className="mt-1.5 block h-px w-3/4 rounded-full bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+          <span
+            className="mt-1.5 block h-px w-3/4 rounded-full"
+            style={{ background: `linear-gradient(to right, transparent, ${roundStyle.line}, transparent)` }}
+          />
         </div>
 
         <p className="text-zinc-500 text-xs tracking-[0.2em] uppercase">{t("vote.prompt")}</p>
