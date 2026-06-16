@@ -11,7 +11,8 @@
     "roundSuffix": "",
     "prompt": "¿Quién está más bueno? Tú decides.",
     "noPhotos": "Aún no hay suficientes fotos.",
-    "noPhotosDesc": "El administrador debe subir al menos 4 fotos."
+    "noPhotosDesc": "El administrador debe subir al menos 4 fotos.",
+    "cardHint": "¿No te convence? Arrastra una tarjeta al jugador"
   },
   "leaderboard": {
     "title": "Estadísticas de todos",

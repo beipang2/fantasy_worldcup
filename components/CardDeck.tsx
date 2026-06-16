@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import RefereeCard from "./RefereeCard";
+import { useLocale } from "./LocaleProvider";
 
 interface DragState {
   card: "yellow" | "red";
@@ -15,6 +16,7 @@ interface CardDeckProps {
 }
 
 export default function CardDeck({ onCardDrop, onHoverChange }: CardDeckProps) {
+  const { t } = useLocale();
   const [dragging, setDragging] = useState<DragState | null>(null);
   const draggingRef = useRef<DragState | null>(null);
   const cloneRef = useRef<HTMLDivElement>(null);
@@ -142,6 +144,9 @@ export default function CardDeck({ onCardDrop, onHoverChange }: CardDeckProps) {
           <span className="text-[9px] text-zinc-500 font-medium tracking-wide leading-none">Red</span>
         </button>
       </div>
+      <p className="text-xs text-zinc-500 text-center mt-1 select-none pointer-events-none">
+        {t("vote.cardHint")}
+      </p>
 
       {/* Drag clone — sits above the fingertip so elementFromPoint(x,y) hits the photo below */}
       {dragging && (

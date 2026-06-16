@@ -11,7 +11,8 @@
     "roundSuffix": "",
     "prompt": "Qui est le plus beau ? À toi de décider.",
     "noPhotos": "Pas encore assez de photos.",
-    "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos."
+    "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos.",
+    "cardHint": "Pas convaincu ? Glisse une carte sur un joueur"
   },
   "leaderboard": {
     "title": "Stats de tout le monde",

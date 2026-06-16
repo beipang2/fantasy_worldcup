@@ -11,7 +11,8 @@
     "roundSuffix": "",
     "prompt": "Who's hotter? You decide.",
     "noPhotos": "Not enough photos yet.",
-    "noPhotosDesc": "Upload at least 4 photos in the admin panel."
+    "noPhotosDesc": "Upload at least 4 photos in the admin panel.",
+    "cardHint": "Don't like the options? Drag a card to a player"
   },
   "leaderboard": {
     "title": "Everyone's Stats",

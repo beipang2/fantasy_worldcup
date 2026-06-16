@@ -11,7 +11,8 @@
     "roundSuffix": " 轮",
     "prompt": "选出你心中最帅的球员",
     "noPhotos": "照片数量不足。",
-    "noPhotosDesc": "管理员需要上传至少4张照片。"
+    "noPhotosDesc": "管理员需要上传至少4张照片。",
+    "cardHint": "不喜欢？拖动卡片给球员发牌"
   },
   "leaderboard": {
     "title": "所有人的数据",
