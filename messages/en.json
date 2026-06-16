@@ -23,6 +23,11 @@
     "heading": "Your Champion",
     "playAgain": "Play again"
   },
+  "cards": {
+    "yellow_card": "Yellow Card",
+    "red_card": "Red Card",
+    "give_card": "Give a card"
+  },
   "admin": {
     "title": "Admin Panel",
     "loginTitle": "Admin Login",

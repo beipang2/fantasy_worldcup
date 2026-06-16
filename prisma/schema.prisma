@@ -23,6 +23,8 @@ model Photo {
   birthDate     String?
   jersey        Int?
   overallRating Int?
+  yellowCards Int      @default(0)
+  redCards    Int      @default(0)
   votesAsA    Vote[]   @relation("photoA")
   votesAsB    Vote[]   @relation("photoB")
 }

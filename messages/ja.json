@@ -23,6 +23,11 @@
     "heading": "あなたのチャンピオン",
     "playAgain": "もう一度プレイ"
   },
+  "cards": {
+    "yellow_card": "イエローカード",
+    "red_card": "レッドカード",
+    "give_card": "カードを出す"
+  },
   "admin": {
     "title": "管理パネル",
     "loginTitle": "管理者ログイン",

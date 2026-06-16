@@ -57,6 +57,14 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
   }, [photos]);
 
+  const handleCard = useCallback((photoId: string, card: "yellow" | "red") => {
+    fetch("/api/card", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ photoId, card }),
+    }).catch(() => {});
+  }, []);
+
   const handleVote = useCallback(
     async (winnerId: string) => {
       if (!bracket || voted) return;
@@ -137,6 +145,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           disabled={!!voted}
           winner={voted === match.a.id}
           loser={voted !== null && voted !== match.a.id}
+          onCard={handleCard}
         />
 
         <div className="flex-shrink-0 flex flex-col items-center gap-1 select-none">
@@ -154,6 +163,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           disabled={!!voted}
           winner={voted === match.b.id}
           loser={voted !== null && voted !== match.b.id}
+          onCard={handleCard}
         />
       </div>
 

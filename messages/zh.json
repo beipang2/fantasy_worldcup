@@ -23,6 +23,11 @@
     "heading": "您的冠军",
     "playAgain": "再玩一次"
   },
+  "cards": {
+    "yellow_card": "黄牌",
+    "red_card": "红牌",
+    "give_card": "出示牌"
+  },
   "admin": {
     "title": "管理面板",
     "loginTitle": "管理员登录",

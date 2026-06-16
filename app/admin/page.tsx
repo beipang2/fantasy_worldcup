@@ -13,10 +13,21 @@ interface Photo {
   losses: number;
 }
 
+interface CardPhoto {
+  id: string;
+  url: string;
+  labels: Record<string, string> | null;
+  yellowCards: number;
+  redCards: number;
+}
+
 export default function AdminPage() {
   const [secret, setSecret] = useState("");
   const [authed, setAuthed] = useState(false);
+  const [activeTab, setActiveTab] = useState<"players" | "cards">("players");
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [cardPhotos, setCardPhotos] = useState<CardPhoto[]>([]);
+  const [cardsLoaded, setCardsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "excluded">("all");
@@ -35,6 +46,15 @@ export default function AdminPage() {
       setMessage("Wrong secret.");
     }
     setLoading(false);
+  }
+
+  async function loadCards() {
+    if (cardsLoaded) return;
+    const res = await fetch("/api/admin/cards");
+    if (res.ok) {
+      setCardPhotos(await res.json());
+      setCardsLoaded(true);
+    }
   }
 
   async function toggleHidden(photo: Photo) {
@@ -153,12 +173,82 @@ export default function AdminPage() {
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto px-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black">Player Management</h1>
+        <h1 className="text-3xl font-black">Admin Panel</h1>
         <div className="text-sm text-zinc-400">
           <span className="text-white font-semibold">{activeCount}</span> active &middot;{" "}
           <span className="text-zinc-500">{excludedCount}</span> excluded
         </div>
       </div>
+
+      {/* Tab switcher */}
+      <div className="flex rounded-xl overflow-hidden border border-zinc-700 text-sm w-fit">
+        <button
+          onClick={() => setActiveTab("players")}
+          className={`px-5 py-2 font-semibold transition-colors ${activeTab === "players" ? "bg-rose-500 text-white" : "bg-zinc-900 text-zinc-400 hover:text-white"}`}
+        >
+          Players
+        </button>
+        <button
+          onClick={() => { setActiveTab("cards"); loadCards(); }}
+          className={`px-5 py-2 font-semibold transition-colors ${activeTab === "cards" ? "bg-rose-500 text-white" : "bg-zinc-900 text-zinc-400 hover:text-white"}`}
+        >
+          🟥 Cards
+        </button>
+      </div>
+
+      {/* Cards tab */}
+      {activeTab === "cards" && (
+        <div className="flex flex-col gap-4">
+          <p className="text-zinc-400 text-sm">Players sorted by total cards received from users.</p>
+          {cardPhotos.length === 0 ? (
+            <p className="text-zinc-500 text-sm">No cards given yet.</p>
+          ) : (
+            <div className="rounded-xl overflow-hidden border border-zinc-800">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-zinc-900 border-b border-zinc-800 text-zinc-400 text-xs uppercase tracking-wider">
+                    <th className="text-left px-4 py-3">Player</th>
+                    <th className="text-center px-4 py-3">🟥 Red</th>
+                    <th className="text-center px-4 py-3">🟨 Yellow</th>
+                    <th className="text-right px-4 py-3">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cardPhotos.map((p, i) => (
+                    <tr key={p.id} className={`border-b border-zinc-800/50 ${i % 2 === 0 ? "bg-zinc-950" : "bg-zinc-900/40"}`}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                            <Image src={p.url} alt={p.labels?.en ?? "Player"} fill className="object-cover object-top" sizes="32px" />
+                          </div>
+                          <span className="text-white font-medium truncate max-w-[180px]">{p.labels?.en ?? "—"}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`font-bold ${p.redCards > 0 ? "text-red-400" : "text-zinc-600"}`}>{p.redCards}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`font-bold ${p.yellowCards > 0 ? "text-amber-400" : "text-zinc-600"}`}>{p.yellowCards}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          className="text-xs font-semibold px-3 py-1 rounded-lg bg-zinc-800 hover:bg-red-900 text-zinc-400 hover:text-red-300 transition-colors"
+                          title="Remove player (coming soon)"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Players tab */}
+      {activeTab === "players" && (<>
 
       {/* Broken photo tool */}
       <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
@@ -278,6 +368,7 @@ export default function AdminPage() {
           );
         })}
       </div>
+      </>)}
     </div>
   );
 }

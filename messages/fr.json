@@ -23,6 +23,11 @@
     "heading": "Votre Champion",
     "playAgain": "Rejouer"
   },
+  "cards": {
+    "yellow_card": "Carton jaune",
+    "red_card": "Carton rouge",
+    "give_card": "Donner un carton"
+  },
   "admin": {
     "title": "Panneau d'administration",
     "loginTitle": "Connexion administrateur",

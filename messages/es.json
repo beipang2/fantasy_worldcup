@@ -23,6 +23,11 @@
     "heading": "Tu Campeón",
     "playAgain": "Jugar de nuevo"
   },
+  "cards": {
+    "yellow_card": "Tarjeta amarilla",
+    "red_card": "Tarjeta roja",
+    "give_card": "Dar tarjeta"
+  },
   "admin": {
     "title": "Panel de administración",
     "loginTitle": "Inicio de sesión admin",
