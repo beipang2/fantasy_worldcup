@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import PhotoCard from "./PhotoCard";
 import Champion from "./Champion";
@@ -52,6 +52,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   const { t } = useLocale();
   const [bracket, setBracket] = useState<BracketState | null>(null);
   const [voted, setVoted] = useState<string | null>(null);
+  const [autoAdvancing, setAutoAdvancing] = useState(false);
+  const autoAdvancingRef = useRef(false);
 
   useEffect(() => {
     try {
@@ -102,6 +104,29 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     },
     [bracket, voted]
   );
+
+  // Auto-advance when both players in a match are carded
+  useEffect(() => {
+    if (!bracket || bracket.champion || voted || autoAdvancingRef.current) return;
+    const match = bracket.queue[0];
+    if (!match) return;
+    const carded = getCardedPlayerIds();
+    if (!carded.has(match.a.id) || !carded.has(match.b.id)) return;
+
+    autoAdvancingRef.current = true;
+    setAutoAdvancing(true);
+    const timer = setTimeout(() => {
+      const randomWinner = Math.random() < 0.5 ? match.a.id : match.b.id;
+      autoAdvancingRef.current = false;
+      setAutoAdvancing(false);
+      handleVote(randomWinner);
+    }, 400);
+    return () => {
+      clearTimeout(timer);
+      autoAdvancingRef.current = false;
+      setAutoAdvancing(false);
+    };
+  }, [bracket, voted, handleVote]);
 
   function restart() {
     const fresh = buildBracket(filterEligible(photos, getCardedPlayerIds()));
@@ -156,25 +181,34 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
         <PhotoCard
           photo={match.a}
           onClick={handleVote}
-          disabled={!!voted}
+          disabled={!!voted || autoAdvancing}
           winner={voted === match.a.id}
           loser={voted !== null && voted !== match.a.id}
           onCard={handleCard}
         />
 
         <div className="flex-shrink-0 flex flex-col items-center gap-1 select-none">
-          <span
-            className="text-2xl md:text-5xl font-black tracking-tighter bg-gradient-to-b from-rose-400 via-red-500 to-amber-500 bg-clip-text text-transparent leading-none"
-            style={{ animation: "vs-pulse 2.5s ease-in-out infinite", filter: "drop-shadow(0 0 12px rgba(244,63,94,0.5))" }}
-          >
-            VS
-          </span>
+          {autoAdvancing ? (
+            <span
+              className="text-xs font-bold tracking-widest text-amber-400 uppercase animate-pulse"
+              style={{ filter: "drop-shadow(0 0 8px rgba(251,191,36,0.7))" }}
+            >
+              ⚡ Auto
+            </span>
+          ) : (
+            <span
+              className="text-2xl md:text-5xl font-black tracking-tighter bg-gradient-to-b from-rose-400 via-red-500 to-amber-500 bg-clip-text text-transparent leading-none"
+              style={{ animation: "vs-pulse 2.5s ease-in-out infinite", filter: "drop-shadow(0 0 12px rgba(244,63,94,0.5))" }}
+            >
+              VS
+            </span>
+          )}
         </div>
 
         <PhotoCard
           photo={match.b}
           onClick={handleVote}
-          disabled={!!voted}
+          disabled={!!voted || autoAdvancing}
           winner={voted === match.b.id}
           loser={voted !== null && voted !== match.b.id}
           onCard={handleCard}
