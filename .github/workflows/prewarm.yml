@@ -1,0 +1,21 @@
+name: Prewarm CDN
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prewarm-sin1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prewarm Singapore
+        run: |
+          echo "Calling prewarm endpoint (targeting sin1/hnd1)..."
+          curl -s --max-time 120 "https://fantasy-worldcup.v-50.net/api/prewarm" | python3 -m json.tool
+
+  prewarm-hnd1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prewarm Tokyo
+        run: |
+          echo "Second call for Tokyo edge..."
+          curl -s --max-time 120 "https://fantasy-worldcup.v-50.net/api/prewarm" | python3 -m json.tool

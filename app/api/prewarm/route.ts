@@ -1,23 +1,23 @@
-import { prisma } from "@/lib/db";
-
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const preferredRegion = ["sin1", "hnd1"];
 
-export async function GET() {
+export async function GET(request: Request) {
   const start = Date.now();
   const region = process.env.VERCEL_REGION ?? "unknown";
 
-  const photos = await prisma.photo.findMany({ select: { url: true } });
+  const base = new URL(request.url).origin;
+  const res = await fetch(`${base}/api/prewarm/urls`);
+  const { urls } = (await res.json()) as { urls: string[] };
 
   let fetched = 0;
   let errors = 0;
 
-  for (let i = 0; i < photos.length; i += 20) {
-    const batch = photos.slice(i, i + 20);
+  for (let i = 0; i < urls.length; i += 20) {
+    const batch = urls.slice(i, i + 20);
     await Promise.all(
-      batch.map(async (p) => {
+      batch.map(async (url) => {
         try {
-          await fetch(p.url, { method: "HEAD" });
+          await fetch(url, { method: "HEAD" });
           fetched++;
         } catch {
           errors++;
