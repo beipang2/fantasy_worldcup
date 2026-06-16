@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { flagEmoji, positionAbbr } from "@/lib/playerUtils";
 import RefereeCard from "./RefereeCard";
@@ -23,13 +24,86 @@ interface PhotoCardProps {
   loser?: boolean;
   highlight?: "yellow" | "red" | null;
   cardFlash?: "yellow" | "red" | null;
+  activeCards?: ("yellow" | "red")[];
+  onCardRemove?: (card: "yellow" | "red") => void;
 }
 
-export default function PhotoCard({ photo, onClick, disabled, winner, loser, highlight, cardFlash }: PhotoCardProps) {
+export default function PhotoCard({ photo, onClick, disabled, winner, loser, highlight, cardFlash, activeCards, onCardRemove }: PhotoCardProps) {
   const hasStats = photo.nationality || photo.position || photo.heightCm || photo.birthDate;
   const age = photo.birthDate
     ? Math.floor((Date.now() - new Date(photo.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
     : null;
+
+  const [pinDrag, setPinDrag] = useState<{ card: "yellow" | "red"; x: number; y: number } | null>(null);
+  const pinDragRef = useRef<{ card: "yellow" | "red"; x: number; y: number } | null>(null);
+  const pinCloneRef = useRef<HTMLDivElement>(null);
+  const onCardRemoveRef = useRef(onCardRemove);
+  useEffect(() => { onCardRemoveRef.current = onCardRemove; }, [onCardRemove]);
+
+  function startPinDrag(card: "yellow" | "red", x: number, y: number) {
+    const state = { card, x, y };
+    pinDragRef.current = state;
+    setPinDrag(state);
+  }
+
+  useEffect(() => {
+    const photoId = photo.id;
+
+    function onMouseMove(e: MouseEvent) {
+      if (!pinDragRef.current) return;
+      const state = { ...pinDragRef.current, x: e.clientX, y: e.clientY };
+      pinDragRef.current = state;
+      setPinDrag({ ...state });
+    }
+
+    function onMouseUp(e: MouseEvent) {
+      if (!pinDragRef.current) return;
+      const card = pinDragRef.current.card;
+      const clone = pinCloneRef.current;
+      if (clone) clone.style.visibility = "hidden";
+      const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      if (clone) clone.style.visibility = "";
+      const hitId = el?.closest("[data-photo-id]")?.getAttribute("data-photo-id") ?? null;
+      if (hitId !== photoId) onCardRemoveRef.current?.(card);
+      pinDragRef.current = null;
+      setPinDrag(null);
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      if (!pinDragRef.current) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const state = { ...pinDragRef.current, x: touch.clientX, y: touch.clientY };
+      pinDragRef.current = state;
+      setPinDrag({ ...state });
+    }
+
+    function onTouchEnd(e: TouchEvent) {
+      if (!pinDragRef.current) return;
+      const touch = e.changedTouches[0];
+      const card = pinDragRef.current.card;
+      const clone = pinCloneRef.current;
+      if (clone) clone.style.visibility = "hidden";
+      const el = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement | null;
+      if (clone) clone.style.visibility = "";
+      const hitId = el?.closest("[data-photo-id]")?.getAttribute("data-photo-id") ?? null;
+      if (hitId !== photoId) onCardRemoveRef.current?.(card);
+      pinDragRef.current = null;
+      setPinDrag(null);
+    }
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [photo.id]);
 
   return (
     <div className="relative w-full max-w-lg" data-photo-id={photo.id}>
@@ -123,6 +197,69 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser, hig
           </div>
         )}
       </button>
+
+      {/* Persistent card indicators in top-right corner — draggable to cancel */}
+      {activeCards && activeCards.length > 0 && (
+        <div className="absolute top-1.5 right-1.5 flex gap-0.5 z-20 select-none">
+          {activeCards.map((cardColor, i) => (
+            <div
+              key={`${cardColor}-${i}`}
+              className="touch-none"
+              style={{
+                width: 16,
+                height: 22,
+                borderRadius: 3,
+                cursor: pinDrag ? "grabbing" : "grab",
+                background:
+                  cardColor === "yellow"
+                    ? "linear-gradient(135deg, #fbbf24, #f59e0b)"
+                    : "linear-gradient(135deg, #f87171, #dc2626)",
+                boxShadow:
+                  cardColor === "yellow"
+                    ? "0 2px 6px rgba(245,158,11,0.65)"
+                    : "0 2px 6px rgba(220,38,38,0.65)",
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                startPinDrag(cardColor, e.clientX, e.clientY);
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const t = e.touches[0];
+                startPinDrag(cardColor, t.clientX, t.clientY);
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Drag clone for pinned card removal */}
+      {pinDrag && (
+        <div
+          ref={pinCloneRef}
+          style={{
+            position: "fixed",
+            left: pinDrag.x - 8,
+            top: pinDrag.y - 18,
+            width: 16,
+            height: 22,
+            borderRadius: 3,
+            transform: "rotate(-10deg) scale(1.5)",
+            background:
+              pinDrag.card === "yellow"
+                ? "linear-gradient(135deg, #fbbf24, #f59e0b)"
+                : "linear-gradient(135deg, #f87171, #dc2626)",
+            boxShadow:
+              pinDrag.card === "yellow"
+                ? "0 4px 12px rgba(245,158,11,0.7)"
+                : "0 4px 12px rgba(220,38,38,0.7)",
+            pointerEvents: "none",
+            zIndex: 50,
+          }}
+        />
+      )}
 
       {/* Card confirmation bounce after a successful drop */}
       {cardFlash && (

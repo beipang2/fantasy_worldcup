@@ -58,6 +58,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   const [cardFlash, setCardFlash] = useState<{ photoId: string; card: "yellow" | "red" } | null>(null);
   const [hoverState, setHoverState] = useState<{ photoId: string; card: "yellow" | "red" } | null>(null);
   const [cardedVersion, setCardedVersion] = useState(0);
+  const [cardedState, setCardedState] = useState<Record<string, ("yellow" | "red")[]>>({});
+  const cardedStateRef = useRef<Record<string, ("yellow" | "red")[]>>({});
 
   useEffect(() => {
     try {
@@ -91,9 +93,39 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
       sessionStorage.setItem(CARDED_KEY, Array.from(ids).join(","));
     } catch {}
 
+    const updated = { ...cardedStateRef.current, [photoId]: [...(cardedStateRef.current[photoId] ?? []), card] };
+    cardedStateRef.current = updated;
+    setCardedState(updated);
+
     setCardFlash({ photoId, card });
     setTimeout(() => setCardFlash(null), 1200);
     setCardedVersion((v) => v + 1);
+  }, []);
+
+  const handleCardRemove = useCallback((photoId: string, card: "yellow" | "red") => {
+    const current = cardedStateRef.current[photoId] ?? [];
+    const idx = current.indexOf(card);
+    if (idx === -1) return;
+    const next = [...current.slice(0, idx), ...current.slice(idx + 1)];
+    const updated = { ...cardedStateRef.current, [photoId]: next };
+    cardedStateRef.current = updated;
+    setCardedState(updated);
+
+    if (next.length === 0) {
+      try {
+        const raw = sessionStorage.getItem(CARDED_KEY) ?? "";
+        const ids = new Set(raw ? raw.split(",") : []);
+        ids.delete(photoId);
+        sessionStorage.setItem(CARDED_KEY, Array.from(ids).join(","));
+      } catch {}
+      setCardedVersion((v) => v + 1);
+    }
+
+    fetch("/api/card/remove", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ photoId, card }),
+    }).catch(() => {});
   }, []);
 
   const handleHoverChange = useCallback(
@@ -246,6 +278,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
             loser={voted !== null && voted !== match.a.id}
             highlight={hoverState?.photoId === match.a.id ? hoverState.card : null}
             cardFlash={cardFlash?.photoId === match.a.id ? cardFlash.card : null}
+            activeCards={cardedState[match.a.id] ?? []}
+            onCardRemove={(card) => handleCardRemove(match.a!.id, card)}
           />
         ) : (
           <div className="relative w-full max-w-lg flex items-center justify-center aspect-[3/4] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02]">
@@ -280,6 +314,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
             loser={voted !== null && voted !== match.b.id}
             highlight={hoverState?.photoId === match.b.id ? hoverState.card : null}
             cardFlash={cardFlash?.photoId === match.b.id ? cardFlash.card : null}
+            activeCards={cardedState[match.b.id] ?? []}
+            onCardRemove={(card) => handleCardRemove(match.b!.id, card)}
           />
         ) : (
           <div className="relative w-full max-w-lg flex items-center justify-center aspect-[3/4] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02]">
