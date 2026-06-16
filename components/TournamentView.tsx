@@ -134,6 +134,14 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     const match = bracket.queue[0];
     if (!match) return;
 
+    // Case 0: both slots are null — propagate another bye immediately, nothing to show
+    if (match.a === null && match.b === null) {
+      const next = advanceWithBye(bracket);
+      setBracket(next);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return;
+    }
+
     // Case 1: one slot is a null bye — the real player auto-wins
     if (match.a === null || match.b === null) {
       const realPlayer = (match.a ?? match.b) as Photo;

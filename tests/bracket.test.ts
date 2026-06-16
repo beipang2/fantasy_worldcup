@@ -248,6 +248,19 @@ describe("advanceWithBye", () => {
     expect(b.champion).toEqual(realPlayer);
   });
 
+  it("null + null (double-bye) propagates another null slot to the next round", () => {
+    // 4-player bracket: both round-1 matches are double-byes
+    let b = buildBracket(makePhotos(4));
+    b = advanceWithBye(b); // match 0: both carded → null
+    b = advanceWithBye(b); // match 1: both carded → null → round ends
+
+    // Round 2 final has both slots null
+    expect(b.round).toBe(2);
+    expect(b.queue).toHaveLength(1);
+    expect(b.queue[0].a).toBeNull();
+    expect(b.queue[0].b).toBeNull();
+  });
+
   it("multiple byes in a round carry through to the next round correctly", () => {
     // 8-player bracket: 4 round-1 matches
     let b = buildBracket(makePhotos(8));
