@@ -9,7 +9,7 @@
   "vote": {
     "round": "第",
     "roundSuffix": " 轮",
-    "prompt": "选择帅哥晋级",
+    "prompt": "选出你心中最帅的球员",
     "noPhotos": "照片数量不足。",
     "noPhotosDesc": "管理员需要上传至少4张照片。"
   },

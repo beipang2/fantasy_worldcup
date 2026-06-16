@@ -9,7 +9,7 @@
   "vote": {
     "round": "Ronda",
     "roundSuffix": "",
-    "prompt": "Elige quién avanza",
+    "prompt": "¿Quién está más bueno? Tú decides.",
     "noPhotos": "Aún no hay suficientes fotos.",
     "noPhotosDesc": "El administrador debe subir al menos 4 fotos."
   },

@@ -9,7 +9,7 @@
   "vote": {
     "round": "Tour",
     "roundSuffix": "",
-    "prompt": "Choisissez qui avance",
+    "prompt": "Qui est le plus beau ? À toi de décider.",
     "noPhotos": "Pas encore assez de photos.",
     "noPhotosDesc": "L'administrateur doit téléverser au moins 4 photos."
   },

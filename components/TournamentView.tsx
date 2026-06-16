@@ -201,7 +201,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           />
         </div>
 
-        <p className="text-zinc-500 text-xs tracking-[0.2em] uppercase">{t("vote.prompt")}</p>
+        <p className="text-zinc-300 text-sm font-semibold tracking-wide">{t("vote.prompt")}</p>
       </div>
 
       {/* Cards + VS */}

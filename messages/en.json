@@ -9,7 +9,7 @@
   "vote": {
     "round": "Round",
     "roundSuffix": "",
-    "prompt": "Choose who advances",
+    "prompt": "Who's hotter? You decide.",
     "noPhotos": "Not enough photos yet.",
     "noPhotosDesc": "Upload at least 4 photos in the admin panel."
   },

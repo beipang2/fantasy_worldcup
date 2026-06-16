@@ -22,10 +22,8 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col items-center gap-6 w-full">
-      <h1 className="text-3xl md:text-5xl font-black tracking-tight text-center bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent leading-tight px-4">
-        {messages.site.tagline}
-      </h1>
       <TournamentView photos={photos} locale={locale} />
+      <p className="text-zinc-600 text-xs text-center px-4 pb-4">{messages.site.tagline}</p>
     </div>
   );
 }
