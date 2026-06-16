@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { flagEmoji, positionAbbr } from "@/lib/playerUtils";
+import RefereeCard from "./RefereeCard";
 
 interface Photo {
   id: string;
@@ -129,8 +130,12 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser, hig
           className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
           style={{ animation: "card-bounce 1.2s ease-out both" }}
         >
-          <span className="text-6xl drop-shadow-lg">
-            {cardFlash === "yellow" ? "🟨" : "🟥"}
+          <span
+            style={{
+              filter: `drop-shadow(0 4px 14px ${cardFlash === "yellow" ? "rgba(245,158,11,0.7)" : "rgba(220,38,38,0.7)"})`,
+            }}
+          >
+            <RefereeCard color={cardFlash} width={52} height={74} />
           </span>
         </div>
       )}

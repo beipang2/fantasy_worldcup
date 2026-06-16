@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import RefereeCard from "./RefereeCard";
 
 interface DragState {
   card: "yellow" | "red";
@@ -92,74 +93,72 @@ export default function CardDeck({ onCardDrop, onHoverChange }: CardDeckProps) {
     setDragging(state);
   }
 
-  const cardStyle = (color: "yellow" | "red", active: boolean): React.CSSProperties => ({
-    width: 28,
-    height: 40,
-    borderRadius: 4,
-    background:
-      color === "yellow"
-        ? "linear-gradient(135deg, #fce043 0%, #f5c518 55%, #d4a000 100%)"
-        : "linear-gradient(135deg, #f04545 0%, #e02020 55%, #a81010 100%)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.35)",
-    border: "none",
-    padding: 0,
-    cursor: active ? "grabbing" : "grab",
-    opacity: active ? 0.35 : 1,
-    transition: "opacity 0.15s, transform 0.15s",
-    transform: active ? "scale(0.92)" : "scale(1)",
-    flexShrink: 0,
-  });
-
   return (
     <>
-      <div className="flex items-center justify-center gap-5 my-1 select-none">
-        <div className="flex flex-col items-center gap-0.5">
-          <button
-            className="touch-none"
-            style={cardStyle("yellow", dragging?.card === "yellow")}
-            onMouseDown={(e) => { e.preventDefault(); startDrag("yellow", e.clientX, e.clientY); }}
-            onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("yellow", t.clientX, t.clientY); }}
-          />
-          <span className="text-[9px] text-zinc-500 font-medium tracking-wide">Yellow</span>
-        </div>
+      <div className="flex items-center justify-center gap-6 my-1 select-none">
+        {/* Yellow card button */}
+        <button
+          className={[
+            "touch-none flex flex-col items-center gap-1 group",
+            "transition-all duration-150",
+            dragging?.card === "yellow" ? "opacity-35 scale-90" : "",
+          ].join(" ")}
+          style={{ cursor: dragging?.card === "yellow" ? "grabbing" : "grab" }}
+          onMouseDown={(e) => { e.preventDefault(); startDrag("yellow", e.clientX, e.clientY); }}
+          onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("yellow", t.clientX, t.clientY); }}
+          aria-label="Yellow card — drag onto a player"
+        >
+          <span
+            className="block transition-transform duration-150 group-hover:scale-110"
+            style={{ filter: "drop-shadow(0 3px 8px rgba(245,158,11,0.5))" }}
+          >
+            <RefereeCard color="yellow" width={28} height={40} />
+          </span>
+          <span className="text-[9px] text-zinc-500 font-medium tracking-wide leading-none">Yellow</span>
+        </button>
 
         <span className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase pointer-events-none">
           drag to player
         </span>
 
-        <div className="flex flex-col items-center gap-0.5">
-          <button
-            className="touch-none"
-            style={cardStyle("red", dragging?.card === "red")}
-            onMouseDown={(e) => { e.preventDefault(); startDrag("red", e.clientX, e.clientY); }}
-            onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("red", t.clientX, t.clientY); }}
-          />
-          <span className="text-[9px] text-zinc-500 font-medium tracking-wide">Red</span>
-        </div>
+        {/* Red card button */}
+        <button
+          className={[
+            "touch-none flex flex-col items-center gap-1 group",
+            "transition-all duration-150",
+            dragging?.card === "red" ? "opacity-35 scale-90" : "",
+          ].join(" ")}
+          style={{ cursor: dragging?.card === "red" ? "grabbing" : "grab" }}
+          onMouseDown={(e) => { e.preventDefault(); startDrag("red", e.clientX, e.clientY); }}
+          onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("red", t.clientX, t.clientY); }}
+          aria-label="Red card — drag onto a player"
+        >
+          <span
+            className="block transition-transform duration-150 group-hover:scale-110"
+            style={{ filter: "drop-shadow(0 3px 8px rgba(220,38,38,0.5))" }}
+          >
+            <RefereeCard color="red" width={28} height={40} />
+          </span>
+          <span className="text-[9px] text-zinc-500 font-medium tracking-wide leading-none">Red</span>
+        </button>
       </div>
 
-      {/* Drag clone — rendered above the pointer so elementFromPoint at touch coords hits the photo */}
+      {/* Drag clone — sits above the fingertip so elementFromPoint(x,y) hits the photo below */}
       {dragging && (
         <div
           ref={cloneRef}
           style={{
             position: "fixed",
-            width: 40,
-            height: 56,
-            borderRadius: 4,
-            background:
-              dragging.card === "yellow"
-                ? "linear-gradient(135deg, #fce043 0%, #f5c518 55%, #d4a000 100%)"
-                : "linear-gradient(135deg, #f04545 0%, #e02020 55%, #a81010 100%)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 14px rgba(0,0,0,0.55)",
-            opacity: 0.85,
-            left: dragging.x - 20,
-            top: dragging.y - 56,
-            transform: "rotate(-8deg)",
+            left: dragging.x - 22,
+            top: dragging.y - 72,
+            transform: "rotate(-10deg)",
+            filter: `drop-shadow(0 6px 16px ${dragging.card === "yellow" ? "rgba(245,158,11,0.55)" : "rgba(220,38,38,0.55)"})`,
             pointerEvents: "none",
             zIndex: 50,
           }}
-        />
+        >
+          <RefereeCard color={dragging.card} width={44} height={62} />
+        </div>
       )}
     </>
   );
