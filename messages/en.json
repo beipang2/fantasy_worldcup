@@ -10,6 +10,7 @@
     "round": "Round",
     "roundSuffix": "",
     "prompt": "Who's hotter? You decide.",
+    "format": "Single Elimination",
     "noPhotos": "Not enough photos yet.",
     "noPhotosDesc": "Upload at least 4 photos in the admin panel.",
     "cardHint": "Don't like the options? Drag a card to a player"

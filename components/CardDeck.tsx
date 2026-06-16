@@ -119,10 +119,6 @@ export default function CardDeck({ onCardDrop, onHoverChange }: CardDeckProps) {
           <span className="text-[9px] text-zinc-500 font-medium tracking-wide leading-none">Yellow</span>
         </button>
 
-        <span className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase pointer-events-none">
-          drag to player
-        </span>
-
         {/* Red card button */}
         <button
           className={[

@@ -231,6 +231,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           />
         </div>
 
+        <p className="text-xs text-zinc-500">{t("vote.format")}</p>
         <p className="text-zinc-300 text-sm font-semibold tracking-wide">{t("vote.prompt")}</p>
       </div>
 

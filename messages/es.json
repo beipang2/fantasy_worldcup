@@ -10,6 +10,7 @@
     "round": "Ronda",
     "roundSuffix": "",
     "prompt": "¿Quién está más bueno? Tú decides.",
+    "format": "Eliminación directa",
     "noPhotos": "Aún no hay suficientes fotos.",
     "noPhotosDesc": "El administrador debe subir al menos 4 fotos.",
     "cardHint": "¿No te convence? Arrastra una tarjeta al jugador"
