@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import PhotoCard from "./PhotoCard";
+import CardDeck from "./CardDeck";
 import Champion from "./Champion";
 import { useLocale } from "./LocaleProvider";
 import { buildBracket, advance, advanceWithBye, type Photo, type BracketState } from "@/lib/bracket";
@@ -54,6 +55,9 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   const [voted, setVoted] = useState<string | null>(null);
   const [autoAdvancing, setAutoAdvancing] = useState(false);
   const autoAdvancingRef = useRef(false);
+  const [cardFlash, setCardFlash] = useState<{ photoId: string; card: "yellow" | "red" } | null>(null);
+  const [hoverState, setHoverState] = useState<{ photoId: string; card: "yellow" | "red" } | null>(null);
+  const [cardedVersion, setCardedVersion] = useState(0);
 
   useEffect(() => {
     try {
@@ -73,13 +77,31 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
   }, [photos]);
 
-  const handleCard = useCallback((photoId: string, card: "yellow" | "red") => {
+  const handleCardDrop = useCallback((photoId: string, card: "yellow" | "red") => {
     fetch("/api/card", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ photoId, card }),
     }).catch(() => {});
+
+    try {
+      const raw = sessionStorage.getItem(CARDED_KEY) ?? "";
+      const ids = new Set(raw ? raw.split(",") : []);
+      ids.add(photoId);
+      sessionStorage.setItem(CARDED_KEY, Array.from(ids).join(","));
+    } catch {}
+
+    setCardFlash({ photoId, card });
+    setTimeout(() => setCardFlash(null), 1200);
+    setCardedVersion((v) => v + 1);
   }, []);
+
+  const handleHoverChange = useCallback(
+    (photoId: string | null, card: "yellow" | "red" | null) => {
+      setHoverState(photoId && card ? { photoId, card } : null);
+    },
+    []
+  );
 
   const handleVote = useCallback(
     async (winnerId: string) => {
@@ -154,7 +176,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
       autoAdvancingRef.current = false;
       setAutoAdvancing(false);
     };
-  }, [bracket, voted, handleVote]);
+  }, [bracket, voted, handleVote, cardedVersion]);
 
   function restart() {
     const fresh = buildBracket(filterEligible(photos, getCardedPlayerIds()));
@@ -213,7 +235,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
             disabled={!!voted || autoAdvancing}
             winner={voted === match.a.id}
             loser={voted !== null && voted !== match.a.id}
-            onCard={handleCard}
+            highlight={hoverState?.photoId === match.a.id ? hoverState.card : null}
+            cardFlash={cardFlash?.photoId === match.a.id ? cardFlash.card : null}
           />
         ) : (
           <div className="relative w-full max-w-lg flex items-center justify-center aspect-[3/4] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02]">
@@ -246,7 +269,8 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
             disabled={!!voted || autoAdvancing}
             winner={voted === match.b.id}
             loser={voted !== null && voted !== match.b.id}
-            onCard={handleCard}
+            highlight={hoverState?.photoId === match.b.id ? hoverState.card : null}
+            cardFlash={cardFlash?.photoId === match.b.id ? cardFlash.card : null}
           />
         ) : (
           <div className="relative w-full max-w-lg flex items-center justify-center aspect-[3/4] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02]">
@@ -254,6 +278,9 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           </div>
         )}
       </div>
+
+      {/* Floating card deck — drag onto a player to issue a card */}
+      <CardDeck onCardDrop={handleCardDrop} onHoverChange={handleHoverChange} />
 
       {/* Progress bar */}
       <div className="w-full max-w-4xl px-1">

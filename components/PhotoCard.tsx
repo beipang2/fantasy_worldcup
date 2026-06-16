@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useRef } from "react";
 import Image from "next/image";
 import { flagEmoji, positionAbbr } from "@/lib/playerUtils";
 
@@ -21,58 +20,20 @@ interface PhotoCardProps {
   disabled?: boolean;
   winner?: boolean;
   loser?: boolean;
-  onCard?: (id: string, card: "yellow" | "red") => void;
+  highlight?: "yellow" | "red" | null;
+  cardFlash?: "yellow" | "red" | null;
 }
 
-export default function PhotoCard({ photo, onClick, disabled, winner, loser, onCard }: PhotoCardProps) {
+export default function PhotoCard({ photo, onClick, disabled, winner, loser, highlight, cardFlash }: PhotoCardProps) {
   const hasStats = photo.nationality || photo.position || photo.heightCm || photo.birthDate;
   const age = photo.birthDate
     ? Math.floor((Date.now() - new Date(photo.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
     : null;
 
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [cardGiven, setCardGiven] = useState<"yellow" | "red" | null>(null);
-  const [hovered, setHovered] = useState(false);
-  const touchStartY = useRef<number | null>(null);
-
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartY.current = e.touches[0].clientY;
-  }
-
-  function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartY.current === null) return;
-    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
-    touchStartY.current = null;
-    if (deltaY < -40 && onCard && !showOverlay) {
-      setShowOverlay(true);
-    }
-  }
-
-  function handleCard(card: "yellow" | "red") {
-    setShowOverlay(false);
-    setCardGiven(card);
-    onCard?.(photo.id, card);
-
-    try {
-      const raw = sessionStorage.getItem("cardedPlayerIds") ?? "";
-      const ids = new Set(raw ? raw.split(",") : []);
-      ids.add(photo.id);
-      sessionStorage.setItem("cardedPlayerIds", Array.from(ids).join(","));
-    } catch {}
-
-    setTimeout(() => setCardGiven(null), 1200);
-  }
-
   return (
-    <div
-      className="relative group w-full max-w-lg"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setHovered(false); setShowOverlay(false); }}
-    >
+    <div className="relative w-full max-w-lg" data-photo-id={photo.id}>
       <button
-        onClick={() => !showOverlay && onClick(photo.id)}
+        onClick={() => onClick(photo.id)}
         disabled={disabled}
         style={
           winner
@@ -80,7 +41,7 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser, onC
             : undefined
         }
         className={[
-          "relative w-full rounded-2xl overflow-hidden flex flex-col",
+          "relative w-full rounded-2xl overflow-hidden flex flex-col group",
           "outline-none focus-visible:ring-4 focus-visible:ring-amber-400",
           "border-2 transition-all duration-300",
           disabled && !winner && !loser ? "cursor-default" : "",
@@ -89,6 +50,10 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser, onC
             : "",
           winner
             ? "border-amber-400 scale-[1.02] -translate-y-1 shadow-2xl shadow-amber-400/50 z-10"
+            : highlight === "yellow"
+            ? "border-amber-400 shadow-[0_0_24px_rgba(251,191,36,0.6)]"
+            : highlight === "red"
+            ? "border-red-400 shadow-[0_0_24px_rgba(239,68,68,0.6)]"
             : "border-white/10 hover:border-rose-500/50 hover:shadow-rose-500/25",
           loser ? "opacity-25 grayscale scale-[0.97] saturate-0" : "",
         ]
@@ -158,56 +123,14 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser, onC
         )}
       </button>
 
-      {/* Desktop card trigger — appears on hover */}
-      {onCard && !loser && !showOverlay && hovered && (
-        <button
-          onClick={(e) => { e.stopPropagation(); setShowOverlay(true); }}
-          className="absolute top-2 right-2 z-10 bg-black/60 hover:bg-black/80 rounded-lg px-2 py-1 text-sm transition-colors select-none"
-          title="Give a card"
-        >
-          🃏
-        </button>
-      )}
-
-      {/* Card overlay */}
-      {showOverlay && onCard && (
-        <div
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-2xl bg-black/80 backdrop-blur-sm"
-          style={{ animation: "slide-up 0.2s ease-out both" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <p className="text-white text-sm font-bold tracking-wide">Give a card</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => handleCard("yellow")}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/50 text-white text-sm font-semibold transition-colors"
-            >
-              🟨 Yellow
-            </button>
-            <button
-              onClick={() => handleCard("red")}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/40 border border-red-400/50 text-white text-sm font-semibold transition-colors"
-            >
-              🟥 Red
-            </button>
-          </div>
-          <button
-            onClick={() => setShowOverlay(false)}
-            className="text-zinc-500 hover:text-zinc-300 text-xs transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* Card confirmation bounce */}
-      {cardGiven && (
+      {/* Card confirmation bounce after a successful drop */}
+      {cardFlash && (
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
           style={{ animation: "card-bounce 1.2s ease-out both" }}
         >
           <span className="text-6xl drop-shadow-lg">
-            {cardGiven === "yellow" ? "🟨" : "🟥"}
+            {cardFlash === "yellow" ? "🟨" : "🟥"}
           </span>
         </div>
       )}
