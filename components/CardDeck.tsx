@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 
 interface DragState {
   card: "yellow" | "red";
@@ -92,60 +92,74 @@ export default function CardDeck({ onCardDrop, onHoverChange }: CardDeckProps) {
     setDragging(state);
   }
 
+  const cardStyle = (color: "yellow" | "red", active: boolean): React.CSSProperties => ({
+    width: 28,
+    height: 40,
+    borderRadius: 4,
+    background:
+      color === "yellow"
+        ? "linear-gradient(135deg, #fce043 0%, #f5c518 55%, #d4a000 100%)"
+        : "linear-gradient(135deg, #f04545 0%, #e02020 55%, #a81010 100%)",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.35)",
+    border: "none",
+    padding: 0,
+    cursor: active ? "grabbing" : "grab",
+    opacity: active ? 0.35 : 1,
+    transition: "opacity 0.15s, transform 0.15s",
+    transform: active ? "scale(0.92)" : "scale(1)",
+    flexShrink: 0,
+  });
+
   return (
     <>
-      <div className="flex items-center justify-center gap-4 my-1 select-none">
-        <button
-          className={[
-            "touch-none cursor-grab active:cursor-grabbing",
-            "flex items-center gap-2 px-4 py-2 rounded-full",
-            "bg-amber-500/10 border border-amber-400/30 text-white text-sm font-semibold",
-            "shadow-[0_0_12px_rgba(251,191,36,0.25)] transition-all duration-200",
-            dragging?.card === "yellow"
-              ? "opacity-40 scale-95"
-              : "hover:bg-amber-500/20 hover:shadow-[0_0_20px_rgba(251,191,36,0.45)]",
-          ].join(" ")}
-          onMouseDown={(e) => { e.preventDefault(); startDrag("yellow", e.clientX, e.clientY); }}
-          onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("yellow", t.clientX, t.clientY); }}
-        >
-          🟨 <span className="hidden sm:inline">Yellow Card</span>
-        </button>
+      <div className="flex items-center justify-center gap-5 my-1 select-none">
+        <div className="flex flex-col items-center gap-0.5">
+          <button
+            className="touch-none"
+            style={cardStyle("yellow", dragging?.card === "yellow")}
+            onMouseDown={(e) => { e.preventDefault(); startDrag("yellow", e.clientX, e.clientY); }}
+            onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("yellow", t.clientX, t.clientY); }}
+          />
+          <span className="text-[9px] text-zinc-500 font-medium tracking-wide">Yellow</span>
+        </div>
 
         <span className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase pointer-events-none">
           drag to player
         </span>
 
-        <button
-          className={[
-            "touch-none cursor-grab active:cursor-grabbing",
-            "flex items-center gap-2 px-4 py-2 rounded-full",
-            "bg-red-500/10 border border-red-400/30 text-white text-sm font-semibold",
-            "shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all duration-200",
-            dragging?.card === "red"
-              ? "opacity-40 scale-95"
-              : "hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(239,68,68,0.45)]",
-          ].join(" ")}
-          onMouseDown={(e) => { e.preventDefault(); startDrag("red", e.clientX, e.clientY); }}
-          onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("red", t.clientX, t.clientY); }}
-        >
-          🟥 <span className="hidden sm:inline">Red Card</span>
-        </button>
+        <div className="flex flex-col items-center gap-0.5">
+          <button
+            className="touch-none"
+            style={cardStyle("red", dragging?.card === "red")}
+            onMouseDown={(e) => { e.preventDefault(); startDrag("red", e.clientX, e.clientY); }}
+            onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; startDrag("red", t.clientX, t.clientY); }}
+          />
+          <span className="text-[9px] text-zinc-500 font-medium tracking-wide">Red</span>
+        </div>
       </div>
 
       {/* Drag clone — rendered above the pointer so elementFromPoint at touch coords hits the photo */}
       {dragging && (
         <div
           ref={cloneRef}
-          className="fixed pointer-events-none z-50 text-4xl"
           style={{
-            left: dragging.x - 22,
-            top: dragging.y - 64,
+            position: "fixed",
+            width: 40,
+            height: 56,
+            borderRadius: 4,
+            background:
+              dragging.card === "yellow"
+                ? "linear-gradient(135deg, #fce043 0%, #f5c518 55%, #d4a000 100%)"
+                : "linear-gradient(135deg, #f04545 0%, #e02020 55%, #a81010 100%)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 14px rgba(0,0,0,0.55)",
+            opacity: 0.85,
+            left: dragging.x - 20,
+            top: dragging.y - 56,
             transform: "rotate(-8deg)",
-            filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.6))",
+            pointerEvents: "none",
+            zIndex: 50,
           }}
-        >
-          {dragging.card === "yellow" ? "🟨" : "🟥"}
-        </div>
+        />
       )}
     </>
   );
