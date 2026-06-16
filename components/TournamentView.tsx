@@ -5,7 +5,7 @@ import Image from "next/image";
 import PhotoCard from "./PhotoCard";
 import Champion from "./Champion";
 import { useLocale } from "./LocaleProvider";
-import { buildBracket, advance, type Photo, type BracketState } from "@/lib/bracket";
+import { buildBracket, advance, advanceWithBye, type Photo, type BracketState } from "@/lib/bracket";
 import BracketView from "./BracketView";
 import type { Locale } from "@/lib/i18n";
 
@@ -85,14 +85,15 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     async (winnerId: string) => {
       if (!bracket || voted) return;
       const match = bracket.queue[0];
-      const winner = match.a.id === winnerId ? match.a : match.b;
+      const winner = match.a?.id === winnerId ? match.a : match.b;
+      if (!winner) return;
 
       setVoted(winnerId);
 
       fetch("/api/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photoAId: match.a.id, photoBId: match.b.id, winnerId }),
+        body: JSON.stringify({ photoAId: match.a?.id ?? null, photoBId: match.b?.id ?? null, winnerId }),
       }).catch(() => {});
 
       await new Promise((r) => setTimeout(r, 700));
@@ -105,21 +106,48 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
     [bracket, voted]
   );
 
-  // Auto-advance when both players in a match are carded
+  // Auto-advance for bye situations
   useEffect(() => {
     if (!bracket || bracket.champion || voted || autoAdvancingRef.current) return;
     const match = bracket.queue[0];
     if (!match) return;
+
+    // Case 1: one slot is a null bye — the real player auto-wins
+    if (match.a === null || match.b === null) {
+      const realPlayer = (match.a ?? match.b) as Photo;
+      autoAdvancingRef.current = true;
+      setAutoAdvancing(true);
+      const timer = setTimeout(() => {
+        autoAdvancingRef.current = false;
+        setAutoAdvancing(false);
+        fetch("/api/vote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ photoAId: match.a?.id ?? null, photoBId: match.b?.id ?? null, winnerId: realPlayer.id }),
+        }).catch(() => {});
+        const next = advance(bracket, realPlayer);
+        setBracket(next);
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      }, 400);
+      return () => {
+        clearTimeout(timer);
+        autoAdvancingRef.current = false;
+        setAutoAdvancing(false);
+      };
+    }
+
+    // Case 2: both players are carded — push a null bye, no winner
     const carded = getCardedPlayerIds();
     if (!carded.has(match.a.id) || !carded.has(match.b.id)) return;
 
     autoAdvancingRef.current = true;
     setAutoAdvancing(true);
     const timer = setTimeout(() => {
-      const randomWinner = Math.random() < 0.5 ? match.a.id : match.b.id;
       autoAdvancingRef.current = false;
       setAutoAdvancing(false);
-      handleVote(randomWinner);
+      const next = advanceWithBye(bracket);
+      setBracket(next);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     }, 400);
     return () => {
       clearTimeout(timer);
@@ -178,14 +206,20 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
 
       {/* Cards + VS */}
       <div className="flex flex-row items-center gap-2 md:gap-6 w-full max-w-4xl">
-        <PhotoCard
-          photo={match.a}
-          onClick={handleVote}
-          disabled={!!voted || autoAdvancing}
-          winner={voted === match.a.id}
-          loser={voted !== null && voted !== match.a.id}
-          onCard={handleCard}
-        />
+        {match.a ? (
+          <PhotoCard
+            photo={match.a}
+            onClick={handleVote}
+            disabled={!!voted || autoAdvancing}
+            winner={voted === match.a.id}
+            loser={voted !== null && voted !== match.a.id}
+            onCard={handleCard}
+          />
+        ) : (
+          <div className="relative w-full max-w-lg flex items-center justify-center aspect-[3/4] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02]">
+            <p className="text-zinc-600 text-sm font-bold tracking-widest uppercase">BYE</p>
+          </div>
+        )}
 
         <div className="flex-shrink-0 flex flex-col items-center gap-1 select-none">
           {autoAdvancing ? (
@@ -193,7 +227,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
               className="text-xs font-bold tracking-widest text-amber-400 uppercase animate-pulse"
               style={{ filter: "drop-shadow(0 0 8px rgba(251,191,36,0.7))" }}
             >
-              ⚡ Auto
+              {match.a === null || match.b === null ? "⚡ Auto Win" : "⚡ Bye"}
             </span>
           ) : (
             <span
@@ -205,14 +239,20 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
           )}
         </div>
 
-        <PhotoCard
-          photo={match.b}
-          onClick={handleVote}
-          disabled={!!voted || autoAdvancing}
-          winner={voted === match.b.id}
-          loser={voted !== null && voted !== match.b.id}
-          onCard={handleCard}
-        />
+        {match.b ? (
+          <PhotoCard
+            photo={match.b}
+            onClick={handleVote}
+            disabled={!!voted || autoAdvancing}
+            winner={voted === match.b.id}
+            loser={voted !== null && voted !== match.b.id}
+            onCard={handleCard}
+          />
+        ) : (
+          <div className="relative w-full max-w-lg flex items-center justify-center aspect-[3/4] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02]">
+            <p className="text-zinc-600 text-sm font-bold tracking-widest uppercase">BYE</p>
+          </div>
+        )}
       </div>
 
       {/* Progress bar */}

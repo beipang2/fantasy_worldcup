@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildBracket, advance } from "@/lib/bracket";
+import { buildBracket, advance, advanceWithBye } from "@/lib/bracket";
 import type { Photo } from "@/lib/bracket";
 
 function makePhotos(n: number): Photo[] {
@@ -187,6 +187,84 @@ describe("replay variety", () => {
     const ids = bracket.queue.flatMap((m) => [m.a.id, m.b.id]);
     expect(ids.length).toBe(16);
     expect(new Set(ids).size).toBe(16);
+  });
+});
+
+describe("advanceWithBye", () => {
+  it("pushes null into winners instead of a real player", () => {
+    let b = buildBracket(makePhotos(4)); // 2 matches in round 1
+    b = advanceWithBye(b);
+    expect(b.winners).toEqual([null]);
+  });
+
+  it("increments matchesPlayed by 1", () => {
+    let b = buildBracket(makePhotos(4));
+    b = advanceWithBye(b);
+    expect(b.matchesPlayed).toBe(1);
+  });
+
+  it("does not add to advancedPhotos", () => {
+    let b = buildBracket(makePhotos(4));
+    b = advanceWithBye(b);
+    expect(b.advancedPhotos).toHaveLength(0);
+  });
+
+  it("does not add to history", () => {
+    let b = buildBracket(makePhotos(4));
+    b = advanceWithBye(b);
+    expect(b.history[0]).toHaveLength(0);
+  });
+
+  it("shrinks the queue by 1", () => {
+    let b = buildBracket(makePhotos(8)); // 4 first-round matches
+    b = advanceWithBye(b);
+    expect(b.queue).toHaveLength(3);
+  });
+
+  it("a null bye in round N produces a null-slot match in round N+1", () => {
+    // 4-player: 2 round-1 matches → round 2 is the final
+    let b = buildBracket(makePhotos(4));
+    const realWinner = b.queue[1].a; // winner of the second match
+    b = advanceWithBye(b);       // match 1: bye → null
+    b = advance(b, realWinner);  // match 2: real winner → round ends
+    // Round 2 final should have one null slot
+    expect(b.round).toBe(2);
+    expect(b.queue).toHaveLength(1);
+    const finalMatch = b.queue[0];
+    expect(finalMatch.a === null || finalMatch.b === null).toBe(true);
+    const realInFinal = finalMatch.a ?? finalMatch.b;
+    expect(realInFinal).toEqual(realWinner);
+  });
+
+  it("a real player auto-wins against a null slot via advance()", () => {
+    let b = buildBracket(makePhotos(4));
+    const realWinner = b.queue[1].a;
+    b = advanceWithBye(b);
+    b = advance(b, realWinner);
+    // Final: one slot is null, real player is the only competitor
+    const finalMatch = b.queue[0];
+    const realPlayer = (finalMatch.a ?? finalMatch.b) as Photo;
+    b = advance(b, realPlayer); // auto-win call
+    expect(b.champion).toEqual(realPlayer);
+  });
+
+  it("multiple byes in a round carry through to the next round correctly", () => {
+    // 8-player bracket: 4 round-1 matches
+    let b = buildBracket(makePhotos(8));
+    const w0 = b.queue[0].a;
+    b = advance(b, w0);      // match 0: real winner
+    b = advanceWithBye(b);   // match 1: bye
+    const w2 = b.queue[0].a;
+    b = advance(b, w2);      // match 2: real winner
+    b = advanceWithBye(b);   // match 3: bye → round ends
+
+    expect(b.round).toBe(2);
+    expect(b.queue).toHaveLength(2);
+    // winners were [w0, null, w2, null] → matches: [w0 vs null] and [w2 vs null]
+    expect(b.queue[0].a).toEqual(w0);
+    expect(b.queue[0].b).toBeNull();
+    expect(b.queue[1].a).toEqual(w2);
+    expect(b.queue[1].b).toBeNull();
   });
 });
 
