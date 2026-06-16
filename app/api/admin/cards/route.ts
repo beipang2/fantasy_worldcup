@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const photos = await prisma.photo.findMany({
     where: { OR: [{ redCards: { gt: 0 } }, { yellowCards: { gt: 0 } }] },
     orderBy: [{ redCards: "desc" }, { yellowCards: "desc" }],
-    select: { id: true, url: true, labels: true, redCards: true, yellowCards: true },
+    select: { id: true, url: true, labels: true, redCards: true, yellowCards: true, excluded: true },
   });
 
   return NextResponse.json(photos);

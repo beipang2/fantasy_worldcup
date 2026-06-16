@@ -19,6 +19,7 @@ interface CardPhoto {
   labels: Record<string, string> | null;
   yellowCards: number;
   redCards: number;
+  excluded: boolean;
 }
 
 export default function AdminPage() {
@@ -54,6 +55,20 @@ export default function AdminPage() {
     if (res.ok) {
       setCardPhotos(await res.json());
       setCardsLoaded(true);
+    }
+  }
+
+  async function toggleExcluded(photo: CardPhoto) {
+    const excluded = !photo.excluded;
+    const res = await fetch("/api/admin/exclude", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ photoId: photo.id, excluded }),
+    });
+    if (res.ok) {
+      setCardPhotos((prev) =>
+        prev.map((p) => (p.id === photo.id ? { ...p, excluded } : p))
+      );
     }
   }
 
@@ -215,13 +230,20 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {cardPhotos.map((p, i) => (
-                    <tr key={p.id} className={`border-b border-zinc-800/50 ${i % 2 === 0 ? "bg-zinc-950" : "bg-zinc-900/40"}`}>
+                    <tr
+                      key={p.id}
+                      className={`border-b border-zinc-800/50 ${i % 2 === 0 ? "bg-zinc-950" : "bg-zinc-900/40"} ${
+                        p.excluded ? "opacity-50" : ""
+                      }`}
+                    >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
                             <Image src={p.url} alt={p.labels?.en ?? "Player"} fill className="object-cover object-top" sizes="32px" />
                           </div>
-                          <span className="text-white font-medium truncate max-w-[180px]">{p.labels?.en ?? "—"}</span>
+                          <span className={`text-white font-medium truncate max-w-[180px] ${p.excluded ? "line-through text-zinc-500" : ""}`}>
+                            {p.labels?.en ?? "—"}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -232,10 +254,14 @@ export default function AdminPage() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button
-                          className="text-xs font-semibold px-3 py-1 rounded-lg bg-zinc-800 hover:bg-red-900 text-zinc-400 hover:text-red-300 transition-colors"
-                          title="Remove player (coming soon)"
+                          onClick={() => toggleExcluded(p)}
+                          className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
+                            p.excluded
+                              ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                              : "bg-zinc-800 hover:bg-red-900 text-zinc-400 hover:text-red-300"
+                          }`}
                         >
-                          Remove
+                          {p.excluded ? "Restore" : "Remove"}
                         </button>
                       </td>
                     </tr>

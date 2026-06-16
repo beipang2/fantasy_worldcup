@@ -36,7 +36,7 @@ function toPhoto(
 
 export async function getPhotoPair(locale: Locale): Promise<[Photo, Photo] | null> {
   const photos = await prisma.photo.findMany({
-    where: { hidden: false },
+    where: { hidden: false, excluded: false },
     select: { id: true, url: true, labels: true, position: true, nationality: true, heightCm: true, birthDate: true, overallRating: true },
   });
   if (photos.length < 2) return null;
@@ -46,7 +46,7 @@ export async function getPhotoPair(locale: Locale): Promise<[Photo, Photo] | nul
 
 export async function getLeaderboard(locale: Locale): Promise<RankedPhoto[]> {
   const photos = await prisma.photo.findMany({
-    where: { hidden: false },
+    where: { hidden: false, excluded: false },
     orderBy: { rating: "desc" },
     select: { id: true, url: true, labels: true, rating: true, wins: true, losses: true, position: true, nationality: true, heightCm: true, birthDate: true, overallRating: true },
   });

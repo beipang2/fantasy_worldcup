@@ -25,6 +25,7 @@ model Photo {
   overallRating Int?
   yellowCards Int      @default(0)
   redCards    Int      @default(0)
+  excluded    Boolean  @default(false)
   votesAsA    Vote[]   @relation("photoA")
   votesAsB    Vote[]   @relation("photoB")
 }
