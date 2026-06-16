@@ -1,5 +1,6 @@
 export const runtime = "edge";
 export const preferredRegion = ["sin1", "hnd1"];
+export const maxDuration = 25;
 
 export async function GET(request: Request) {
   const start = Date.now();
@@ -12,8 +13,9 @@ export async function GET(request: Request) {
   let fetched = 0;
   let errors = 0;
 
-  for (let i = 0; i < urls.length; i += 20) {
-    const batch = urls.slice(i, i + 20);
+  for (let i = 0; i < urls.length; i += 50) {
+    if (Date.now() - start > 20000) break;
+    const batch = urls.slice(i, i + 50);
     await Promise.all(
       batch.map(async (url) => {
         try {
