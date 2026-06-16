@@ -10,6 +10,20 @@ import BracketView from "./BracketView";
 import type { Locale } from "@/lib/i18n";
 
 const STORAGE_KEY = "h2h_bracket";
+const CARDED_KEY = "cardedPlayerIds";
+
+function getCardedPlayerIds(): Set<string> {
+  try {
+    const raw = sessionStorage.getItem(CARDED_KEY) ?? "";
+    return new Set(raw ? raw.split(",") : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function filterEligible<T extends { id: string }>(photos: T[], excluded: Set<string>): T[] {
+  return excluded.size > 0 ? photos.filter((p) => !excluded.has(p.id)) : photos;
+}
 
 const ZH_ROUND_LABELS: Record<number, string> = { 1: "决赛", 2: "半决赛", 3: "8强", 4: "16强" };
 const EN_ROUND_LABELS: Record<number, string> = { 1: "Final", 2: "Semifinals", 3: "Quarterfinals", 4: "Round of 16" };
@@ -52,7 +66,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
         return;
       }
     } catch {}
-    const initial = buildBracket(photos);
+    const initial = buildBracket(filterEligible(photos, getCardedPlayerIds()));
     setBracket(initial);
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
   }, [photos]);
@@ -90,7 +104,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   );
 
   function restart() {
-    const fresh = buildBracket(photos);
+    const fresh = buildBracket(filterEligible(photos, getCardedPlayerIds()));
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
     setBracket(fresh);
   }

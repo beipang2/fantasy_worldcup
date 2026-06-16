@@ -52,6 +52,14 @@ export default function PhotoCard({ photo, onClick, disabled, winner, loser, onC
     setShowOverlay(false);
     setCardGiven(card);
     onCard?.(photo.id, card);
+
+    try {
+      const raw = sessionStorage.getItem("cardedPlayerIds") ?? "";
+      const ids = new Set(raw ? raw.split(",") : []);
+      ids.add(photo.id);
+      sessionStorage.setItem("cardedPlayerIds", Array.from(ids).join(","));
+    } catch {}
+
     setTimeout(() => setCardGiven(null), 1200);
   }
 
