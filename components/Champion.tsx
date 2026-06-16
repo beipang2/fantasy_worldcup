@@ -10,13 +10,6 @@ interface Photo {
   label: string | null;
 }
 
-interface ChampionStats {
-  wins: number;
-  losses: number;
-  rating: number;
-  sessionWins: number;
-}
-
 const SPARKLE_POSITIONS = [
   { top: "8%",  left: "12%",  delay: "0s",    size: 18 },
   { top: "15%", right: "10%", delay: "0.3s",  size: 14 },
@@ -29,11 +22,9 @@ const SPARKLE_POSITIONS = [
 export default function Champion({
   photo,
   onRestart,
-  stats,
 }: {
   photo: Photo;
   onRestart: () => void;
-  stats?: ChampionStats;
 }) {
   const { t } = useLocale();
   const captureRef = useRef<HTMLDivElement>(null);
@@ -145,19 +136,6 @@ export default function Champion({
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Stats */}
-        {stats && (
-          <div
-            className="flex items-stretch gap-px rounded-2xl overflow-hidden border border-white/8 w-full max-w-xs"
-            style={{ animation: "slide-up 0.5s 0.35s ease-out both", opacity: 0 }}
-          >
-            <StatCell label="Wins"     value={stats.wins}                accent="text-amber-400" />
-            <StatCell label="Losses"   value={stats.losses}              accent="text-zinc-400"  />
-            <StatCell label="ELO"      value={Math.round(stats.rating)}  accent="text-rose-400"  />
-            <StatCell label="This run" value={`${stats.sessionWins}W`}   accent="text-emerald-400" />
-          </div>
-        )}
-
         {/* Watermark */}
         <p className="text-zinc-700 text-[10px] tracking-widest uppercase font-semibold mt-1 select-none">
           {t("site.name")}
@@ -197,15 +175,6 @@ export default function Champion({
           <div className="absolute top-0 bottom-0 w-1/2 -skew-x-12 -translate-x-full group-hover:[animation:card-shimmer_0.6s_ease-in_forwards] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         </div>
       </button>
-    </div>
-  );
-}
-
-function StatCell({ label, value, accent }: { label: string; value: number | string; accent: string }) {
-  return (
-    <div className="flex-1 flex flex-col items-center gap-0.5 py-3 px-2 bg-white/4">
-      <span className={`text-lg font-black tabular-nums leading-none ${accent}`}>{value}</span>
-      <span className="text-zinc-600 text-[9px] font-semibold uppercase tracking-widest">{label}</span>
     </div>
   );
 }

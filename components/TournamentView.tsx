@@ -90,17 +90,7 @@ export default function TournamentView({ photos, locale }: { photos: RankedPhoto
   if (!bracket) return null;
 
   if (bracket.champion) {
-    const dbPhoto = photos.find((p) => p.id === bracket.champion!.id);
-    const stats =
-      dbPhoto?.wins !== undefined
-        ? {
-            wins: dbPhoto.wins,
-            losses: dbPhoto.losses ?? 0,
-            rating: dbPhoto.rating ?? 1000,
-            sessionWins: bracket.totalRounds,
-          }
-        : undefined;
-    return <Champion photo={bracket.champion} onRestart={restart} stats={stats} />;
+    return <Champion photo={bracket.champion} onRestart={restart} />;
   }
 
   const match = bracket.queue[0];
