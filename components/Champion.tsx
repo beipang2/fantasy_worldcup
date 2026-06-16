@@ -143,6 +143,18 @@ export default function Champion({
       </div>
       {/* ── End capture zone ── */}
 
+      {/* Play again */}
+      <button
+        onClick={onRestart}
+        className="relative group px-8 py-3 rounded-full font-black text-sm tracking-widest uppercase overflow-hidden bg-gradient-to-r from-rose-600 to-amber-500 text-white shadow-lg shadow-rose-900/40 hover:shadow-rose-500/50 hover:scale-[1.04] active:scale-[0.98] transition-all duration-200"
+        style={{ animation: "slide-up 0.5s 0.5s ease-out both", opacity: 0 }}
+      >
+        <span className="relative z-10">{t("champion.playAgain")}</span>
+        <div className="absolute inset-0 overflow-hidden rounded-full">
+          <div className="absolute top-0 bottom-0 w-1/2 -skew-x-12 -translate-x-full group-hover:[animation:card-shimmer_0.6s_ease-in_forwards] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        </div>
+      </button>
+
       {/* Save as Image */}
       <button
         type="button"
@@ -162,18 +174,6 @@ export default function Champion({
             Save as Image
           </>
         )}
-      </button>
-
-      {/* Play again */}
-      <button
-        onClick={onRestart}
-        className="relative group px-8 py-3 rounded-full font-black text-sm tracking-widest uppercase overflow-hidden bg-gradient-to-r from-rose-600 to-amber-500 text-white shadow-lg shadow-rose-900/40 hover:shadow-rose-500/50 hover:scale-[1.04] active:scale-[0.98] transition-all duration-200"
-        style={{ animation: "slide-up 0.5s 0.5s ease-out both", opacity: 0 }}
-      >
-        <span className="relative z-10">{t("champion.playAgain")}</span>
-        <div className="absolute inset-0 overflow-hidden rounded-full">
-          <div className="absolute top-0 bottom-0 w-1/2 -skew-x-12 -translate-x-full group-hover:[animation:card-shimmer_0.6s_ease-in_forwards] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        </div>
       </button>
     </div>
   );
